@@ -52,14 +52,14 @@ class KivyCamera(Image):
             # for (x, y) in shape:
             #     cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
 
-            face_img = frame[y:y+h, x:x+w]
+            face_img = morphed_frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
-            morphed_frame[y:y+h, x:x+w] = face_img
+            frame[y:y+h, x:x+w] = face_img
 
             # frame = face_utils.visualize_facial_landmarks(morphed_frame, shape)
 
         # convert to texture
-        buf1 = cv2.flip(morphed_frame, -1)
+        buf1 = cv2.flip(frame, -1)
         # buf1 = cv2.flip(frame, 1)
         buf = buf1.tostring()
         image_texture = Texture.create(
