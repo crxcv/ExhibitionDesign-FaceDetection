@@ -27,11 +27,13 @@ import time
 Builder.load_string('''
 
 <Root>
-    OriginalImg
-    ImgAnim
+    Images
 
-<OriginalImg>
+
+
+<Images>:
     Image:
+        id: original
         pos: 10, root.pos_y - 538/2
         size: 778, 583
         source: 'images/orig.JPEG'
@@ -39,14 +41,12 @@ Builder.load_string('''
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
 
-<ImgAnim>:
 
 
     Image:
         id: grey
         pos: 10, root.pos_y - 538/2
         size: 778, 583
-        source: 'images/img_grey.JPEG'
         allow_stretch: False
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
@@ -55,26 +55,24 @@ Builder.load_string('''
         id: blur
         pos: 10, root.pos_y - 538/2
         size: 778, 583
-        source: 'images/blur.JPG'
         allow_stretch: False
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
 
     Image:
-        id: grey2
+        id: grey2alpha
         pos: 10, root.pos_y - 538/2
         size: 778, 583
-        source: 'images/img_grey.JPEG'
         allow_stretch: False
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
 
 
     Image:
-        id: alpha
-        pos: 10, root.pos_y - 538/2
-        size: 778, 583
+        id: orig2alpha
         source: 'images/orig.JPEG'
+        pos: 10, root.pos_y - 538/2
+        size: 778, 583
         allow_stretch: False
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
@@ -109,44 +107,68 @@ class OriginalImg(Widget):
 
 
 
-class ImgAnim(Widget):
+class Images(Widget):
     pos_y = ObjectProperty(Window.height/2)
+    def __init__(self, **kwargs):
+        super(Images, self).__init__(**kwargs)
+        # self.create_textures()
 
 
-    def do_layout(self, *args):
-        num_children = len(self.children)
-    def add_widget(self, widget):
-        super(ImgAnim, self).add_widget(widget)
-        # self.do_layout()
+    def build_textures(self):
+        img = cv2.imread('images/orig.JPEG')
+        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_grey = cv2.flip(grey, 0)
+        # img_grey = np.dstack([grey, grey, grey])
+        buf = img_grey.tostring()
+        texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='luminance')
+        texture.blit_buffer(buf, colorfmt='luminance', bufferfmt='ubyte')
 
-    def remove_widget(self, widget):
-        super(ImgAnim, self).remove_widget(widget)
-        # self.do_layout()
+        self.ids['grey'].texture = texture
+        self.ids['grey2alpha'].texture = texture
+
+        img_blur = cv2.GaussianBlur(img_grey, (5, 5), 0)
+        img_blur = np.dstack([img_blur, img_blur, img_blur])
+        buf = img_blur.tostring()
+        texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='bgr')
+        texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+        self.ids['blur'].texture = texture
+
+
 
     def move_ani(self):
-        print("animating")
+        """ Moves all image instances """
+
+        self.build_textures()
         Animation.cancel_all(self)
         target_x = 800
 
         ani = Animation(x=target_x, duration=1, t='in_out_sine')
         ani.start(self.ids['grey'])
-        ani.start(self.ids['alpha'])
+        ani.start(self.ids['orig2alpha'])
         ani.start(self.ids['blur'])
-        ani.start(self.ids['grey2'])
+        ani.start(self.ids['grey2alpha'])
 
     def alpha_ani(self):
+        """ reduces opacity of overlaying original image """
+
+
+
         ani2 = Animation(opacity=0, duration=1, t='in_out_sine')
-        ani2.start(self.ids['alpha'])
+        ani2.start(self.ids['orig2alpha'])
 
     def move_blur_ani(self):
+        """ moves 2nd grey image and blur image
+        """
         ani3 = Animation(x=Window.width-900, duration=1, t='in_out_sine')
         ani3.start(self.ids['blur'])
-        ani3.start(self.ids['grey2'])
+        ani3.start(self.ids['grey2alpha'])
         # time.sleep(1)
 
     def alpha_blur(self):
+        """ reduces opacity of grey image to show blurred image """
+
         ani4 = Animation(opacity=0, duration=1, t='in_out_sine')
-        ani4.start(self.ids['grey2'])
+        ani4.start(self.ids['grey2alpha'])
 
     def pyr_ani(self):
         pass
