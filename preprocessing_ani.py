@@ -9,7 +9,6 @@ from kivy.base import runTouchApp
 
 from kivy.core.image import Image
 from kivy.uix.widget import Widget
-from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics.texture import Texture
 
 from kivy.clock import Clock
@@ -29,8 +28,6 @@ Builder.load_string('''
 <Root>
     Images
 
-
-
 <Images>:
     Image:
         id: original
@@ -45,6 +42,7 @@ Builder.load_string('''
 
     Image:
         id: grey
+        texture: root.create_texture('grey')
         pos: 10, root.pos_y - 538/2
         size: 778, 583
         allow_stretch: False
@@ -53,6 +51,7 @@ Builder.load_string('''
 
     Image:
         id: blur
+        texture: root.create_texture('blur')
         pos: 10, root.pos_y - 538/2
         size: 778, 583
         allow_stretch: False
@@ -61,6 +60,7 @@ Builder.load_string('''
 
     Image:
         id: grey2alpha
+        texture: root.create_texture('grey')
         pos: 10, root.pos_y - 538/2
         size: 778, 583
         allow_stretch: False
@@ -70,15 +70,12 @@ Builder.load_string('''
 
     Image:
         id: orig2alpha
-        source: 'images/orig.JPEG'
+        texture: root.create_texture('orig')
         pos: 10, root.pos_y - 538/2
         size: 778, 583
         allow_stretch: False
         keep_ratio: True
         pos_hint: {'center_x', 'center_y'}
-
-
-
 ''')
 
 
@@ -111,34 +108,51 @@ class Images(Widget):
     pos_y = ObjectProperty(Window.height/2)
     def __init__(self, **kwargs):
         super(Images, self).__init__(**kwargs)
+
+        self.img = cv2.imread('images/orig.JPEG')
         # self.create_textures()
 
 
-    def build_textures(self):
-        img = cv2.imread('images/orig.JPEG')
-        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img_grey = cv2.flip(grey, 0)
+    def create_texture(self, img_name):
+        img = cv2.flip(self.img, 0)
+        img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        colorfmt = 'luminance'
+
+        if img_name == 'orig':
+            buf = img.tostring()
+            colorfmt = 'bgr'
+
+        if img_name == 'grey':
+            buf = img_grey.tostring()
+
         # img_grey = np.dstack([grey, grey, grey])
-        buf = img_grey.tostring()
-        texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='luminance')
-        texture.blit_buffer(buf, colorfmt='luminance', bufferfmt='ubyte')
+        if img_name == "blur":
+            img_grey = cv2.GaussianBlur(img_grey, (5, 5), 0)
+            buf = img_grey.tostring()
 
-        self.ids['grey'].texture = texture
-        self.ids['grey2alpha'].texture = texture
 
-        img_blur = cv2.GaussianBlur(img_grey, (5, 5), 0)
-        img_blur = np.dstack([img_blur, img_blur, img_blur])
-        buf = img_blur.tostring()
-        texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='bgr')
-        texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        self.ids['blur'].texture = texture
+        texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt=colorfmt)
+        texture.blit_buffer(buf, colorfmt=colorfmt, bufferfmt='ubyte')
+
+        return texture
+
+        # self.ids['grey'].texture = texture
+        # self.ids['grey2alpha'].texture = texture
+        #
+        # img_blur =
+        # img_blur = np.dstack([img_blur, img_blur, img_blur])
+        # buf = img_blur.tostring()
+        # texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='bgr')
+        # texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+        # self.ids['blur'].texture = texture
+
 
 
 
     def move_ani(self):
         """ Moves all image instances """
 
-        self.build_textures()
         Animation.cancel_all(self)
         target_x = 800
 
