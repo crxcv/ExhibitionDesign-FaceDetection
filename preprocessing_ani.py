@@ -22,8 +22,7 @@ from kivy.properties import ObjectProperty, NumericProperty
 import cv2
 import imutils
 import numpy as np
-import time
-
+from skimage.transform import pyramid_gaussian
 
 
 Builder.load_string('''
@@ -179,14 +178,26 @@ class Preproc_Anim(Widget):
         self.pyramid(self.img)
         print("children: {}".format(self.children))
         print("im in pyr: {}".format(self.im_in_pyr))
-        for i in range(self.im_in_pyr):
+        for (i, resized) in enumerate(pyramid_gaussian(image, downscale=2)):
+            texture = self.create_texture(image=resized, is_colored=False)
+            if resized.shape[0] < 30 or resized.shape[1] < 30:
+                break
+
+            im = Image(source=None)
+            im.texture = texture
+            im.pos = (0, 0)
+            im.id = 'pyr_{}'.format(self.im_in_pyr)
+            self.add_widget(im)
+
+
             x = Window.height/len(self.img_pyr)*i if i>0 else 0
             anis.append(Animation(x=x,
                         y=Window.height/4,
                         duration=1,
                         t='in_out_sine')
             )
-            anis[i].start(self.img_pyr[i])
+            # anis[i].start(self.img_pyr[i])
+            anis[i].start(im)
             i += 1
 
 
