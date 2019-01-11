@@ -7,8 +7,10 @@ Config.set('graphics', 'fullscreen', 'auto')
 from kivy.lang import Builder
 from kivy.base import runTouchApp
 
-from kivy.core.image import Image
+from kivy.uix.image import Image
 from kivy.uix.widget import Widget
+from kivy.uix.floatlayout import FloatLayout
+from kivy.factory import Factory
 from kivy.graphics.texture import Texture
 
 from kivy.clock import Clock
@@ -18,6 +20,7 @@ from kivy.core.window import Window
 from kivy.properties import ObjectProperty, NumericProperty
 
 import cv2
+import imutils
 import numpy as np
 import time
 
@@ -25,134 +28,97 @@ import time
 
 Builder.load_string('''
 
-<Root>
-    Images
+<Root>:
+    Preproc_Anim
 
-<Images>:
+
+<Preproc_Anim>:
     Image:
         id: original
-        pos: 10, root.pos_y - 538/2
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
         size: 778, 583
-        source: 'images/orig.JPEG'
         allow_stretch: False
         keep_ratio: True
-        pos_hint: {'center_x', 'center_y'}
-
-
 
     Image:
         id: grey
         texture: root.create_texture('grey')
-        pos: 10, root.pos_y - 538/2
+        pos: 10, root.pos_y
         size: 778, 583
         allow_stretch: False
         keep_ratio: True
-        pos_hint: {'center_x', 'center_y'}
 
     Image:
         id: blur
         texture: root.create_texture('blur')
-        pos: 10, root.pos_y - 538/2
+        pos: 10, root.pos_y
         size: 778, 583
         allow_stretch: False
         keep_ratio: True
-        pos_hint: {'center_x', 'center_y'}
 
     Image:
         id: grey2alpha
         texture: root.create_texture('grey')
-        pos: 10, root.pos_y - 538/2
+        pos: 10, root.pos_y
         size: 778, 583
         allow_stretch: False
         keep_ratio: True
-        pos_hint: {'center_x', 'center_y'}
-
 
     Image:
         id: orig2alpha
-        texture: root.create_texture('orig')
-        pos: 10, root.pos_y - 538/2
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
         size: 778, 583
         allow_stretch: False
         keep_ratio: True
-        pos_hint: {'center_x', 'center_y'}
+
 ''')
 
 
 class Root(Widget):
     pass
-    # def do_layout(self, *args):
-    #     num_children = len(self.children)
-    #
-    # def on_pos(self, *args):
-    #     self.do_layout()
-    #
-    # def add_widget(self, widget):
-    #     super(Root, self).add_widget(widget)
-    #     self.do_layout()
-    # def remove_widget(self, widget):
-    #     super(Root, self).remove_widget(widget)
-    #     self.do_layout()
-
-class OriginalImg(Widget):
-    #
-    pos_y = ObjectProperty(Window.height/2)
-    # def __init__(self, **kwargs):
-    #     super(OriginalImg, self).__init__(**kwargs)
-    #     self.pos = (300, 400)
 
 
 
+class Preproc_Anim(Widget):
+    pos_y = ObjectProperty(Window.height/2 + 100)
+    img_pyr = []
+    im_in_pyr = 0
 
-class Images(Widget):
-    pos_y = ObjectProperty(Window.height/2)
     def __init__(self, **kwargs):
-        super(Images, self).__init__(**kwargs)
+        super(Preproc_Anim, self).__init__(**kwargs)
 
         self.img = cv2.imread('images/orig.JPEG')
-        # self.create_textures()
+        self.img = cv2.flip(self.img, 0)
 
 
-    def create_texture(self, img_name):
-        img = cv2.flip(self.img, 0)
-        img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        colorfmt = 'luminance'
+    def create_texture(self, img_name=None, image = None, is_colored = False):
+        if image is None:
+            img = self.img
+        else:
+            img = image
 
-        if img_name == 'orig':
-            buf = img.tostring()
+        if is_colored:
             colorfmt = 'bgr'
+        else:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            colorfmt = 'luminance'
 
-        if img_name == 'grey':
-            buf = img_grey.tostring()
-
-        # img_grey = np.dstack([grey, grey, grey])
         if img_name == "blur":
-            img_grey = cv2.GaussianBlur(img_grey, (5, 5), 0)
-            buf = img_grey.tostring()
+            img = cv2.GaussianBlur(img, (5, 5), 0)
 
-
+        buf = img.tostring()
         texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt=colorfmt)
         texture.blit_buffer(buf, colorfmt=colorfmt, bufferfmt='ubyte')
+        print("texture type of {}: {}".format(img_name, type(texture)))
 
         return texture
-
-        # self.ids['grey'].texture = texture
-        # self.ids['grey2alpha'].texture = texture
-        #
-        # img_blur =
-        # img_blur = np.dstack([img_blur, img_blur, img_blur])
-        # buf = img_blur.tostring()
-        # texture = Texture.create(size=(img_grey.shape[1], img_grey.shape[0]), colorfmt='bgr')
-        # texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        # self.ids['blur'].texture = texture
-
-
 
 
     def move_ani(self):
         """ Moves all image instances """
-
         Animation.cancel_all(self)
         target_x = 800
 
@@ -164,9 +130,6 @@ class Images(Widget):
 
     def alpha_ani(self):
         """ reduces opacity of overlaying original image """
-
-
-
         ani2 = Animation(opacity=0, duration=1, t='in_out_sine')
         ani2.start(self.ids['orig2alpha'])
 
@@ -176,7 +139,6 @@ class Images(Widget):
         ani3 = Animation(x=Window.width-900, duration=1, t='in_out_sine')
         ani3.start(self.ids['blur'])
         ani3.start(self.ids['grey2alpha'])
-        # time.sleep(1)
 
     def alpha_blur(self):
         """ reduces opacity of grey image to show blurred image """
@@ -184,11 +146,53 @@ class Images(Widget):
         ani4 = Animation(opacity=0, duration=1, t='in_out_sine')
         ani4.start(self.ids['grey2alpha'])
 
+    def pyramid(self, image, scale=1.5, min_size=(30, 30)):
+        # yield image
+        self.im_in_pyr = 0
+        while True:
+            w = int(image.shape[1]/scale)
+            #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            image = imutils.resize(image, width=w)
+            image = cv2.GaussianBlur(image, (5, 5), 0)
+            texture = self.create_texture(image=image, is_colored=False)
+            print("texture type of img_pyr {}".format( type(texture)))
+
+
+            if image.shape[0] < min_size[1] or image.shape[1] < min_size[0]:
+                break
+            # new = Factory.Images()
+            # texture=texture, pos=self.ids['blur'].pos, id=
+            im = Image(source=None)
+            im.texture = texture
+            im.pos = (0, 0)
+            im.id = 'pyr_{}'.format(self.im_in_pyr)
+
+            self.img_pyr.append(im)
+            self.add_widget(im)
+            # self.add_widget(im, index=self.im_in_pyr)
+            # self.img_pyr.append(i)
+            self.im_in_pyr += 1
+
     def pyr_ani(self):
-        pass
+
+        anis = []
+        self.pyramid(self.img)
+        print("children: {}".format(self.children))
+        print("im in pyr: {}".format(self.im_in_pyr))
+        for i in range(self.im_in_pyr):
+            x = Window.height/len(self.img_pyr)*i if i>0 else 0
+            anis.append(Animation(x=x,
+                        y=Window.height/4,
+                        duration=1,
+                        t='in_out_sine')
+            )
+            anis[i].start(self.img_pyr[i])
+            i += 1
+
+
 
     aniNum = 0
-    ani_dict = {0:move_ani , 1:alpha_ani, 2:move_blur_ani, 3:alpha_blur}
+    ani_dict = {0:move_ani , 1:alpha_ani, 2:move_blur_ani, 3:alpha_blur, 4:pyr_ani}
     ani_iter = iter(ani_dict.items())
 
     def on_touch_down(self, touch):
