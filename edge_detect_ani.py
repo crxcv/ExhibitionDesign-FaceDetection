@@ -94,16 +94,25 @@ class Images(Widget):
 #   sobelx = sobel[0]
 #   sobely = gradients.gradient_y(img)[0]
 #   uint8 --> CV_16S/CV_32F/CV_64F
+
     img = cv2.medianBlur(img, 11)
-    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=-1)
-    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=-1)
-    print("sobel: {}".format(sobelx.dtype))
-
-
+    sobelx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=-1)
+    sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=-1)
     angle = np.absolute(np.arctan2(sobely, sobelx) * (180 / np.pi))
     angle = np.uint8(angle)
 
     mag = np.sqrt(sobelx**2.0 + sobely**2.0)
+    mag = np.absolute(mag)
+    mag = np.uint8(mag)
+
+
+    img_mag = cv2.medianBlur(img, 11)
+    sobelx_mag = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=-1)
+    sobely_mag = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=-1)
+    angle_mag = np.absolute(np.arctan2(sobely_mag, sobelx_mag) * (180 / np.pi))
+    angle_mag = np.uint8(angle_mag)
+
+    mag = np.sqrt(sobelx_mag**2.0 + sobely_mag**2.0)
     mag = np.absolute(mag)
     mag = np.uint8(mag)
 
@@ -120,6 +129,7 @@ class Images(Widget):
 
         def float_to_int(imgi):
 
+
             min = np.min(imgi)
             print("np.min: ".format(np.min(imgi)))
             img = imgi - min
@@ -131,7 +141,7 @@ class Images(Widget):
             print(img)
             img = imgi.astype(np.float16)
 
-            return img
+            return imgi
 
 
         if image is None:
@@ -143,7 +153,7 @@ class Images(Widget):
 
 
 
-        bufferfmt='short'
+        bufferfmt='float'
         colorfmt = 'luminance'
 
         if img_name == "blur":
