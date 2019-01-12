@@ -87,34 +87,28 @@ class Images(Widget):
     # img = cv2.resize(img, None, fx=0.7, fy=0.7)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-#   gradients = dlib.image_gradients()
 
-    # returns float 32
-#   sobel= gradients.gradient_x(img)
-#   sobelx = sobel[0]
-#   sobely = gradients.gradient_y(img)[0]
-#   uint8 --> CV_16S/CV_32F/CV_64F
 
     img = cv2.medianBlur(img, 11)
-    sobelx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=-1)
-    sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=-1)
-    angle = np.absolute(np.arctan2(sobely, sobelx) * (180 / np.pi))
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+
+    angle = np.arctan2(sobely, sobelx) * (180 / np.pi)
+    # angle = np.absolute(angle)
     angle = np.uint8(angle)
 
     mag = np.sqrt(sobelx**2.0 + sobely**2.0)
     mag = np.absolute(mag)
     mag = np.uint8(mag)
 
+    sobelx = np.absolute(sobelx)
+    sobelx = np.uint8(sobelx)
+    # sobelx = 255 - sobelx
+    sobely = np.absolute(sobely)
+    sobely = np.uint8(sobely)
+    # sobely = 255 - sobely
 
-    img_mag = cv2.medianBlur(img, 11)
-    sobelx_mag = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=-1)
-    sobely_mag = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=-1)
-    angle_mag = np.absolute(np.arctan2(sobely_mag, sobelx_mag) * (180 / np.pi))
-    angle_mag = np.uint8(angle_mag)
 
-    mag = np.sqrt(sobelx_mag**2.0 + sobely_mag**2.0)
-    mag = np.absolute(mag)
-    mag = np.uint8(mag)
 
     img_blur = cv2.GaussianBlur(img, (5, 5), 0)
 
@@ -126,22 +120,22 @@ class Images(Widget):
 
 
     def create_texture(self, img_name=None, image=None):
+        bufferfmt='ubyte'
+        colorfmt = 'luminance'
 
-        def float_to_int(imgi):
-
-
-            min = np.min(imgi)
-            print("np.min: ".format(np.min(imgi)))
-            img = imgi - min
-            max = np.max(img)
-            print("np.max: ".format(max))
-            div = max/float(255)
-            print("np.div: ".format(div))
-            img = np.float16(np.round(img/div))
-            print(img)
-            img = imgi.astype(np.float16)
-
-            return imgi
+        # def float_to_int(imgi):
+        #     min = np.min(imgi)
+        #     print("np.min: ".format(np.min(imgi)))
+        #     img = imgi - min
+        #     max = np.max(img)
+        #     print("np.max: ".format(max))
+        #     div = max/float(255)
+        #     print("np.div: ".format(div))
+        #     img = np.float16(np.round(img/div))
+        #     print(img)
+        #     img = imgi.astype(np.float16)
+        #
+        #     return imgi
 
 
         if image is None:
@@ -151,35 +145,25 @@ class Images(Widget):
         print(img_name)
         print(img.dtype)
 
-
-
-        bufferfmt='float'
-        colorfmt = 'luminance'
-
         if img_name == "blur":
             img = self.img_blur
             print("blur: {}".format(img.dtype))
-            bufferfmt='ubyte'
 
         elif img_name == "sobel_x":
             img = self.sobelx
             print(img.dtype)
             print(img)
-            img = float_to_int(img)
 
         elif img_name == "sobel_y":
-            img = float_to_int(self.sobely)
+            img = self.sobely
 
         elif img_name == "angle":
-            bufferfmt='ubyte'
             img = self.angle
             print ("angle depth")
             print (img.dtype)
 
         elif img_name == "mag":
-            bufferfmt='ubyte'
-            img = self.mag.astype(np.uint8)
-            # img = (255 - img)
+            img = self.mag
             print ("mag depth")
             print (img.dtype)
 
