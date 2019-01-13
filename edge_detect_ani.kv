@@ -1,0 +1,98 @@
+#:import win kivy.core.window
+
+<Root>:
+    Picture:
+        id: grey
+        texture: root.create_texture('grey')
+        pos: 0, win.Window.height/2
+        size: root.orig_size
+        do_translation: True
+    Picture:
+        id: blur
+        texture: root.create_texture('blur')
+        pos: 0, 0
+        size: root.orig_size
+        do_translation: True
+    Picture:
+        id: mag
+        texture: root.create_texture('mag')
+        pos: 2*win.Window.width/4, 10
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+        pos_hint: {'center_x', 'center_y'}
+    Picture:
+        id: angle
+        texture: root.create_texture('angle')
+        pos: 2*win.Window.width/4, win.Window.height/2
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+        pos_hint: {'center_x', 'center_y'}
+
+    Picture:
+        id: sobel_y
+        texture: root.create_texture('sobel_y')
+        pos: 1*win.Window.width/4, 10
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+        pos_hint: {'center_x', 'center_y'}
+    Picture:
+        id: sobel_x
+        texture: root.create_texture('sobel_x')
+        pos: 1*win.Window.width/4, win.Window.height/2
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+        pos_hint: {'center_x', 'center_y'}
+
+
+
+
+
+<Picture>:
+    # each time a picture is created, the image can delay the loading
+    # as soon as the image is loaded, ensure that the center is changed
+    # to the center of the screen.
+    # on_size: self.center = win.Window.center
+    size: image.size
+    # texture: texture
+    # allow_stretch = image.allow_stretch
+    size_hint: None, None
+    # pos: self.pos
+    do_translation: False
+    do_rotation: False
+
+    Image:
+        id: image
+        # source: root.source
+        texture : root.texture
+
+        # create initial image to be 400 pixels width
+        size: 400, 400 / self.image_ratio
+
+        # add shadow background
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+
+
+
+<Images>:
+    FloatLayout:
+        StencilView:
+
+            pos: 10, root.pos_y
+            size: root.orig_size
+            Picture:
+                id: grey
+                texture: root.create_texture('grey')
+                pos: 10, root.pos_y
+                size: root.orig_size
+                allow_stretch: True
+                keep_ratio: True
+                pos_hint: {'center_x', 'center_y'}
+    StencilView:
+        pos: 0, 0
+        size: win.Window.width, win.Window.height
