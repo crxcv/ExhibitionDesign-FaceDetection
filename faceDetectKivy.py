@@ -1,10 +1,11 @@
 # coding: utf-8
+
+# fullscreen
 from kivy.config import Config
 Config.set('graphics', 'fullscreen', 'auto')
 
 import cv2
 import numpy as np
-# fullscreen
 from imutils import face_utils, paths
 from imutils.object_detection import non_max_suppression
 from imutils.video import FPS, WebcamVideoStream
@@ -71,13 +72,13 @@ class KivyCamera(Image):
 
         return dst
 
-    def get_circle_vals(self):
-        # vals = [self.to_parent(self.circle_y, self.circle_x), self.circle_r]
-        vals = [[self.circle_y, self.circle_x], self.circle_r]
-        print("circle vals in KvCam: {}".format(vals))
-        print("circle toparent in KvCam: {}".format(
-            self.to_parent(self.circle_y, self.circle_x)))
-        return vals
+    # def get_circle_vals(self):
+    #     # vals = [self.to_parent(self.circle_y, self.circle_x), self.circle_r]
+    #     vals = [[self.circle_y, self.circle_x], self.circle_r]
+    #     print("circle vals in KvCam: {}".format(vals))
+    #     print("circle toparent in KvCam: {}".format(
+    #         self.to_parent(self.circle_y, self.circle_x)))
+    #     return vals
 
     def update(self):
         frame = self.videostream.read()
@@ -96,16 +97,22 @@ class KivyCamera(Image):
             #     cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
 
             self.circle_r = (w + w / 2) / 2
-            circle_y = x + w / 2
-            circle_x = y + h / 2
+            circle_x = x + w / 2
+            circle_y = y + h / 2
 
-            rr, cc = circle(circle_x, circle_y, self.circle_r, frame.shape)
+            rr, cc = circle(circle_y, circle_x, self.circle_r, frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
 
             #  TODO:
             # flip :)
-
-            self.circle_pos = self.to_parent(x, y)
+            # this works, circle a few px under face
+            c_pos = self.to_window((x+w/2), y+h)
+            # c_pos = self.to_window(x+self.circle_r, y+h)
+            # print('c_pos window coords: {}'.format(c_pos))
+            self.circle_pos = [(frame.shape[1] - c_pos[0]), (frame.shape[0] - c_pos[1])]
+            # print('circle size-pos parent coords: {}\nimg size: {}\nx, y of face: {}, {}'.format(self.circle_pos, frame.shape, x, y))
+            # print("".format(frame.shape[:1]))
+            # print("x, y of face: {}, {}".format(x, y))
             # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
@@ -158,7 +165,7 @@ class Screen(FloatLayout):
         Clock.schedule_interval(self.update, 1.0 / 30)
 
     def update(self, dt):
-        print("screen ids: {}".format(self.ids))
+        # print("screen ids: {}".format(self.ids))
         self.ids.cam.update()
 
     def destroy(self):
