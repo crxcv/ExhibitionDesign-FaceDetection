@@ -1,0 +1,68 @@
+#:import win kivy.core.window
+
+<Rings>:
+    radius: root.radius
+    canvas:
+        Color:
+            rgb: 0.502, 0.2588, 0.9569
+        Line:
+            width: 3
+            circle: self.pos[0], self.pos[1], self.radius
+        Color:
+            rgb: 0.2588, 0.3725, 0.9569
+        Line:
+            width: 3
+            circle: self.pos[0], self.pos[1], self.radius +10
+        Color:
+            rgb: 0.2392, 1., 1.
+        Line:
+            width: 3
+            circle: self.pos[0], self.pos[1], self.radius +20
+
+<KivyCamera>:
+    circle_pos: root.circle_pos
+    circle_r: root.circle_r
+    # texture: root.update()
+
+
+
+
+
+
+<Screen>:
+    KivyCamera:
+        id: cam
+
+    Rings:
+        id: ring1
+        pos: cam.circle_pos
+        radius: cam.circle_r
+
+
+# blau - fast lila
+# HEX	#425ff4
+# RGB	rgb(66, 95, 244) 0.2588, 0.3725, 0.9569
+# HSV	hsv(230°, 73%, 96%)
+# HSL	hsl(230°, 90%, 61%)
+# CMYK	cmyk(73%, 61%, 0%, 4%)
+
+# lila
+# HEX	#8042f4
+# RGB	rgb(128, 66, 244) 0.502, 0.2588, 0.9569
+# HSV	hsv(261°, 73%, 96%)
+# HSL	hsl(261°, 90%, 61%)
+# CMYK	cmyk(48%, 73%, 0%, 4%)
+
+# pink
+# HEX	#f23dff
+# RGB	rgb(242, 61, 255) 0.9490, 0.2392, 1
+# HSV	hsv(296°, 76%, 100%)
+# HSL	hsl(296°, 100%, 62%)
+# CMYK	cmyk(5%, 76%, 0%, 0%)
+
+# cyan
+# HEX	#3de1ff
+# RGB	rgb(61, 225, 255) 0.2392, 1, 1
+# HSV	hsv(189°, 76%, 100%)
+# HSL	hsl(189°, 100%, 62%)
+# CMYK	cmyk(76%, 12%, 0%, 0%)
