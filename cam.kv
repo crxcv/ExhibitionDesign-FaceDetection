@@ -1,4 +1,5 @@
-#:import win kivy.core.window
+# :import win kivy.core.window
+
 
 <Rings>:
     radius: root.radius
@@ -12,22 +13,18 @@
             rgb: 0.2588, 0.3725, 0.9569
         Line:
             width: 3
-            circle: self.pos[0], self.pos[1], self.radius +10
+            circle: self.pos[0], self.pos[1], self.radius + 10
         Color:
             rgb: 0.2392, 1., 1.
         Line:
             width: 3
-            circle: self.pos[0], self.pos[1], self.radius +20
+            circle: self.pos[0], self.pos[1], self.radius + 20
+
 
 <KivyCamera>:
     circle_pos: root.circle_pos
     circle_r: root.circle_r
     # texture: root.update()
-
-
-
-
-
 
 <Screen>:
     KivyCamera:
