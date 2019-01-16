@@ -1,8 +1,8 @@
 # coding: utf-8
 
 # fullscreen
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+# from kivy.config import Config
+# Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.lang import Builder
 from kivy.base import runTouchApp
@@ -25,54 +25,7 @@ import numpy as np
 from skimage.transform import pyramid_gaussian
 
 
-Builder.load_string('''
-
-<Root>:
-    Preproc_Anim
-
-
-<Preproc_Anim>:
-    Image:
-        id: original
-        texture: root.create_texture('orig', is_colored=True)
-        pos: 10, root.pos_y
-        size: 778, 583
-        allow_stretch: False
-        keep_ratio: True
-
-    Image:
-        id: grey
-        texture: root.create_texture('grey')
-        pos: 10, root.pos_y
-        size: 778, 583
-        allow_stretch: False
-        keep_ratio: True
-
-    Image:
-        id: blur
-        texture: root.create_texture('blur')
-        pos: 10, root.pos_y
-        size: 778, 583
-        allow_stretch: False
-        keep_ratio: True
-
-    Image:
-        id: grey2alpha
-        texture: root.create_texture('grey')
-        pos: 10, root.pos_y
-        size: 778, 583
-        allow_stretch: False
-        keep_ratio: True
-
-    Image:
-        id: orig2alpha
-        texture: root.create_texture('orig', is_colored=True)
-        pos: 10, root.pos_y
-        size: 778, 583
-        allow_stretch: False
-        keep_ratio: True
-
-''')
+Builder.load_file('preprocessing.kv')
 
 
 class Root(Widget):
@@ -84,12 +37,14 @@ class Preproc_Anim(Widget):
     pos_y = ObjectProperty(Window.height/2 + 100)
     img_pyr = []
     im_in_pyr = 0
-
+    img = ObjectProperty(cv2.imread('images/orig.JPEG'))
+    img = cv2.flip(self.img, 0)
+    
     def __init__(self, **kwargs):
         super(Preproc_Anim, self).__init__(**kwargs)
 
-        self.img = cv2.imread('images/orig.JPEG')
-        self.img = cv2.flip(self.img, 0)
+        # self.img = cv2.imread('images/orig.JPEG')
+        # self.img = cv2.flip(self.img, 0)
 
 
 
@@ -175,10 +130,10 @@ class Preproc_Anim(Widget):
     def pyr_ani(self):
 
         anis = []
-        self.pyramid(self.img)
+        # self.pyramid(self.img)
         print("children: {}".format(self.children))
         print("im in pyr: {}".format(self.im_in_pyr))
-        for (i, resized) in enumerate(pyramid_gaussian(image, downscale=2)):
+        for (i, resized) in enumerate(pyramid_gaussian(self.ids.blur, downscale=2)):
             texture = self.create_texture(image=resized, is_colored=False)
             if resized.shape[0] < 30 or resized.shape[1] < 30:
                 break
@@ -221,5 +176,5 @@ class Preproc_Anim(Widget):
 
 
 
-
-runTouchApp(Root())
+if __name__ == '__main__':
+    runTouchApp(Root())

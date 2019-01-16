@@ -1,0 +1,46 @@
+<Root>:
+    Preproc_Anim
+
+
+<Preproc_Anim>:
+    # id: preprocessingScreen
+    # name: "preprocessingScreen"
+    Image:
+        id: original
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
+        size: 778, 583
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: grey
+        texture: root.create_texture('grey')
+        pos: 10, root.pos_y
+        size: 778, 583
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: blur
+        texture: root.create_texture('blur')
+        pos: 10, root.pos_y
+        size: 778, 583
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: grey2alpha
+        texture: root.create_texture('grey')
+        pos: 10, root.pos_y
+        size: 778, 583
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: orig2alpha
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
+        size: 778, 583
+        allow_stretch: False
+        keep_ratio: True
