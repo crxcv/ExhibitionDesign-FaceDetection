@@ -3,21 +3,22 @@
 <Rings>:
     radius: root.radius
     canvas:
+
         Color:
             rgb: 0.502, 0.2588, 0.9569
         Line:
             width: 3
-            circle: self.pos[0], self.pos[1], self.radius
-        Color:
-            rgb: 0.2588, 0.3725, 0.9569
-        Line:
-            width: 3
-            circle: self.pos[0], self.pos[1], self.radius + 10
-        Color:
-            rgb: 0.2392, 1., 1.
-        Line:
-            width: 3
-            circle: self.pos[0], self.pos[1], self.radius + 20
+            circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+        # Color:
+        #     rgb: 0.2588, 0.3725, 0.9569
+        # Line:
+        #     width: 3
+        #     circle: self.pos[0], self.pos[1], self.radius + 10
+        # Color:
+        #     rgb: 0.2392, 1., 1.
+        # Line:
+        #     width: 3
+        #     circle: self.pos[0], self.pos[1], self.radius + 20
 
 
 <KivyCamera>:
@@ -25,15 +26,50 @@
     circle_r: root.circle_r
     # texture: root.update()
 
+    Rings:
+        id: ring1
+        pos: root.circle_pos
+        radius: root.circle_r
+
+
 <Screen>:
     KivyCamera:
         id: cam
 
-    Rings:
-        id: ring1
-        pos: cam.circle_pos
-        radius: cam.circle_r
 
+# output coords:
+#
+# c_pos parent coords: (182, 96)
+# circle win-pos parent coords: [1184, 672]
+# img size: (480, 640, 3)
+# x, y of face: 182, 96
+# c_pos parent coords: (187, 104)
+# circle win-pos parent coords: [1179, 664]
+# img size: (480, 640, 3)
+# x, y of face: 187, 104
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (182, 96)
+# circle win-pos parent coords: [1184, 672]
+# img size: (480, 640, 3)
+# x, y of face: 182, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (124, 96)
+# circle win-pos parent coords: [1242, 672]
+# img size: (480, 640, 3)
 
 # blau - fast lila
 # HEX	#425ff4

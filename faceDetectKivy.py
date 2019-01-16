@@ -18,6 +18,7 @@ from kivy.lang import Builder
 from kivy.properties import (ListProperty, NumericProperty, ObjectProperty,
                              StringProperty)
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from skimage.draw import circle
@@ -82,7 +83,7 @@ class KivyCamera(Image):
 
     def update(self):
         frame = self.videostream.read()
-        # frame = cv2.flip(frame, -1)
+        frame = cv2.flip(frame, -1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # keep all 3 channels:
         # gray = np.dstack([gray, gray, gray])
@@ -103,16 +104,31 @@ class KivyCamera(Image):
             rr, cc = circle(circle_y, circle_x, self.circle_r, frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
 
-            #  TODO:
-            # flip :)
+            # x, y: 132, 116
+            # cx, cy: 209.5, 193.0
+            # cx/y parent: (209.5, 193.0)
+            # cx/y to window: (209.5, 193.0)
+            # x, y: 153, 139
+            # x, y widget (153, 139)
+            # cx, cy: 217.5, 203.5
+            # cx/y parent: (217.5, 203.5)
+            # cx/y to window: (217.5, 203.5)
+            # x, y: 150, 116
+            # x, y widget (150, 116)
+            # cx, cy: 227.0, 193.0
+            # cx/y parent: (227.0, 193.0)
+            # cx/y to window: (227.0, 193.0)
+
+            # x, y: 440, 239
+            # x, y widget (440, 239)
+            # cx, cy: 504.5, 303.5
+            # cx/y parent: (504.5, 303.5)
+            # cx/y to window: (504.5, 30
             # this works, circle a few px under face
-            c_pos = self.to_window((x+w/2), y+h)
-            # c_pos = self.to_window(x+self.circle_r, y+h)
-            # print('c_pos window coords: {}'.format(c_pos))
-            self.circle_pos = [(frame.shape[1] - c_pos[0]), (frame.shape[0] - c_pos[1])]
-            # print('circle size-pos parent coords: {}\nimg size: {}\nx, y of face: {}, {}'.format(self.circle_pos, frame.shape, x, y))
-            # print("".format(frame.shape[:1]))
-            # print("x, y of face: {}, {}".format(x, y))
+            # c_pos = self.to_window((x+w/2), y+h)
+            # self.circle_pos = self.to_window(frame.shape[1] - circle_x, frame.shape[0] - circle_y)
+            self.circle_pos = self.to_window(x+w/2-self.circle_r, y+w/2+self.circle_r)
+            print("x, y: {}, {}\nx, y widget {}\ncx, cy: {}, {}\ncx/y parent: {}\ncx/y to window: {}".format(x, y, self.to_widget(x, y), circle_x, circle_y, self.to_parent(circle_x, circle_y), self.to_window(circle_x, circle_y)))
             # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
@@ -123,9 +139,9 @@ class KivyCamera(Image):
 
         # convert to texture
         # buf1 = cv2.flip(frame, 1)
-        buf1 = cv2.flip(morphed_frame, -1)
+        # buf1 = cv2.flip(morphed_frame, -1)
 
-        buf = buf1.tostring()
+        buf = morphed_frame.tostring()
         # if self.f < 1:
         #     print("type buf1: {}".format(type(buf1)))
         image_texture = Texture.create(
@@ -142,7 +158,7 @@ class KivyCamera(Image):
         self.videostream.stop()
 
 
-class Rings(Scatter):
+class Rings(Widget):
     radius = NumericProperty(10)
     update_pos = True
 
