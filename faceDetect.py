@@ -1,8 +1,9 @@
 # coding: utf-8
+if __name__ == '__main__':
+    # fullscreen
+    from kivy.config import Config
+    Config.set('graphics', 'fullscreen', 'auto')
 
-# fullscreen
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
 
 import cv2
 import numpy as np
@@ -25,6 +26,12 @@ from skimage.draw import circle
 
 import dlib
 
+# from kivy.uix.screenmanager import Screen
+
+# from preprocessing_ani import Preproc_Anim
+
+Builder.load_file('faceDetect.kv')
+
 
 
 
@@ -39,11 +46,23 @@ class KivyCamera(Image):
     # circle_y = NumericProperty(0)
     circle_r = NumericProperty(0)
     # videostream = ObjectProperty(None)
+    # videostream = None#  WebcamVideoStream(0)  # .start()
+    # detector = dlib.get_frontal_face_detector()
+    # predictor = dlib.shape_predictor(
+    #     "shape_predictor_68_face_landmarks.dat")
+    #
+    # hog = cv2.HOGDescriptor()
+    # hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+    # # pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
+
+    def start(self):
         # self.videostream = capture
-        self.videostream = WebcamVideoStream().start()
+        self.videostream = WebcamVideoStream(0).start()
+        # Clock.schedule_interval(self.update, 1.0/30)
+        print("starting video capture")
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(
             "shape_predictor_68_face_landmarks.dat")
@@ -52,7 +71,7 @@ class KivyCamera(Image):
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-        # Clock.schedule_interval(self.update, 1.0/fps)
+
 
     def morphology_transform(self, img, morph_operator=2, element=1, ksize=18):
         morph_op_dic = {0: cv2.MORPH_OPEN, 1: cv2.MORPH_CLOSE,
@@ -73,17 +92,10 @@ class KivyCamera(Image):
 
         return dst
 
-    # def get_circle_vals(self):
-    #     # vals = [self.to_parent(self.circle_y, self.circle_x), self.circle_r]
-    #     vals = [[self.circle_y, self.circle_x], self.circle_r]
-    #     print("circle vals in KvCam: {}".format(vals))
-    #     print("circle toparent in KvCam: {}".format(
-    #         self.to_parent(self.circle_y, self.circle_x)))
-    #     return vals
 
-    def update(self):
+    def update(self, dt):
         frame = self.videostream.read()
-        frame = cv2.flip(frame, -1)
+        # frame = cv2.flip(frame, -1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # keep all 3 channels:
         # gray = np.dstack([gray, gray, gray])
@@ -126,9 +138,9 @@ class KivyCamera(Image):
             # cx/y to window: (504.5, 30
             # this works, circle a few px under face
             # c_pos = self.to_window((x+w/2), y+h)
-            # self.circle_pos = self.to_window(frame.shape[1] - circle_x, frame.shape[0] - circle_y)
-            self.circle_pos = self.to_window(x+w/2-self.circle_r, y+w/2+self.circle_r)
-            print("x, y: {}, {}\nx, y widget {}\ncx, cy: {}, {}\ncx/y parent: {}\ncx/y to window: {}".format(x, y, self.to_widget(x, y), circle_x, circle_y, self.to_parent(circle_x, circle_y), self.to_window(circle_x, circle_y)))
+            self.circle_pos = self.to_window(frame.shape[1] - circle_x, frame.shape[0] - circle_y)
+            # self.circle_pos = self.to_window(x+w/2-self.circle_r, y+w/2+self.circle_r)
+            # print("x, y: {}, {}\nx, y widget {}\ncx, cy: {}, {}\ncx/y parent: {}\ncx/y to window: {}".format(x, y, self.to_widget(x, y), circle_x, circle_y, self.to_parent(circle_x, circle_y), self.to_window(circle_x, circle_y)))
             # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
@@ -139,9 +151,9 @@ class KivyCamera(Image):
 
         # convert to texture
         # buf1 = cv2.flip(frame, 1)
-        # buf1 = cv2.flip(morphed_frame, -1)
+        buf1 = cv2.flip(morphed_frame, -1)
 
-        buf = morphed_frame.tostring()
+        buf = buf1.tostring()
         # if self.f < 1:
         #     print("type buf1: {}".format(type(buf1)))
         image_texture = Texture.create(
@@ -155,7 +167,12 @@ class KivyCamera(Image):
         # self.fps.update()
         # self.f += 1
     def stop(self):
+        print("stopping video capture")
         self.videostream.stop()
+
+    # def on_touch_down(self, touch):
+    #     print("KivyCamera touched at {}".format(touch.pos))
+    #     return super(KivyCamera, self).on_touch_down(touch)
 
 
 class Rings(Widget):
@@ -172,25 +189,27 @@ class Rings(Widget):
     #         print("circle in rings: {}".format(self.pos))
 
 
-class Screen(FloatLayout):
+class CamScreen(FloatLayout):
 
     def __init__(self, **kwargs):
-        super(Screen, self).__init__(**kwargs)
+        super(CamScreen, self).__init__(**kwargs)
         self.fps = FPS().start()
-
+        self.cam = KivyCamera()
+        self.cam.start()
+        print("facedect.py camscreen init")
         Clock.schedule_interval(self.update, 1.0 / 30)
 
     def update(self, dt):
         # print("screen ids: {}".format(self.ids))
-        self.ids.cam.update()
+        self.cam.update(dt)
 
     def destroy(self):
-        self.ids.cam.stop()
+        self.cam.stop()
 
 
 class CamApp(App):
     def build(self):
-        self.screen = Screen()
+        self.screen = CamScreen()
         return self.screen
 
     def on_stop(self):

@@ -1,8 +1,9 @@
 # coding: utf-8
 
 # fullscreen
-from kivy.config import Config
-Config.set('graphics', 'fullscreen', 'auto')
+if __name__ == '__main__':
+    from kivy.config import Config
+    Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.graphics import *
 
@@ -24,6 +25,8 @@ from kivy.animation import Animation
 
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, ListProperty, StringProperty
+
+from kivy.uix.screenmanager import Screen
 
 import cv2
 import dlib
@@ -116,7 +119,8 @@ class Picture(Scatter):
         #         pass
         # return changed
 
-class Root(Widget):
+class EdgeDetect(Widget):
+    name = StringProperty('edgedetectScreen')
     img = cv2.imread('images/orig.JPEG')
     img = cv2.flip(img, 0)
     print("shape: {}".format(img.shape))
@@ -151,7 +155,7 @@ class Root(Widget):
     win_height = ObjectProperty( Window.height)
     scale = ObjectProperty(2)
 
-    grabbed = {}
+    grabbed = ObjectProperty({})
 
     pic_pos = ObjectProperty([10, Window.height/2])
     blur_pos = ObjectProperty([10, 10])
@@ -199,7 +203,7 @@ class Root(Widget):
 
         else:
             print("touch not in parent")
-            return super(Root, self).on_touch_down(touch)
+            return super(EdgeDetect, self).on_touch_down(touch)
 
     def on_touch_move(self, touch):
         if touch.grab_current is self:
@@ -254,4 +258,5 @@ class Root(Widget):
 
         return texture
 
-runTouchApp(Root())
+if __name__ == '__main__':
+    runTouchApp(EdgeDetect())
