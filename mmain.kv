@@ -1,0 +1,51 @@
+#:import win kivy.core.window.Window
+#:import clock kivy.clock.Clock
+
+
+<Circles>:
+    radius: 100
+    size: 100, 100
+    color: root.color
+    # target: root.target
+    canvas:
+        Color:
+            rgb: self.color
+            # 0.502, 0.2588, 0.9569
+        Ellipse:
+            pos:  self.pos[0], self.pos[1]  #
+            size:  self.radius*2, self.radius*2
+
+<Menu>:
+    Circles:
+        id: top_left
+        pos: -100, win.height-100
+        color: 0.502, 0.2588, 0.9569
+        on_release: app.manager.current = 'camScreen'
+    Circles:
+        id: top_right
+        color: 0.2588, 0.3725, 0.9569
+        pos:  win.width-100, win.height-100
+        on_release: app.manager.current = 'preprocScreen'
+    Circles:
+        id: bottom_right
+        color: 0.2392, 1., 1.
+        pos: win.width-100, -100
+        on_release: app.manager.current = 'edgeScreen'
+
+<CamScreen>:
+    # name: 'camScreen'
+    cam: cam
+    KivyCamera:
+        id: cam
+    Menu:
+        id: menu
+<PreprocScreen>:
+    # name: 'preprocScreen'
+    Preproc_Anim:
+        id: preproc
+    Menu
+<EdgedetScreen>:
+    # name: 'edgedetScreen'
+    EdgeDetect:
+        id: edgedet
+    Menu

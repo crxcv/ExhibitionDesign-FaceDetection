@@ -4,61 +4,92 @@ Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.clock import Clock
+from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.properties import ListProperty, StringProperty, ObjectProperty
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.clock import Clock
 
 # local libraries
 from edge_detect_ani import EdgeDetect
 from preprocessing_ani import Preproc_Anim
 from faceDetect import KivyCamera
 
-# root_widget = Builder.load_file('main.kv')
+
+root_widget = Builder.load_file('mmain.kv')
+
+
+class Circles(ButtonBehavior, Widget):
+    color = ListProperty([1., 1., 1.])
+    # target = ObjectProperty(None)
+
+    # def on_touch_down(self, touch):
+    #     # print("Circles touched at {}".format(touch.pos))
+    #
+    #     if self.collide_point(*touch.pos):
+    #         self.pressed = touch.pos
+    #         print('circle {} pressed at {}'.format(self.id, touch.pos))
+    #         return True  # self.on_touch_up()
+    #     return super(Circles, self).on_touch_down(touch)
+
+
+class Menu(Widget):
+    pass
+
+
+class ScreenManagement(ScreenManager):
+    pass
+
+
+class CamScreen(Screen):
+    cam = ObjectProperty()
+
+    def on_enter(self):
+        print("entering camscreen")
+        print('ids: {}'.format(self.ids))
+        print('children: {}'.format(self.children))
+
+        self.cam.start()
+        self.clock = Clock.schedule_interval(self.cam.update, 1/30)
+
+    def on_leave(self):
+        print("leaving camscreen")
+        self.cam.stop()
+
+    # def on_touch_down(self, touch):
+    #     print("CamScreen touched at {}".format(touch.pos))
+    #     return super(CamScreen, self).on_touch_down(touch)
+
+
+class PreprocScreen(Screen):
+    def on_enter(self):
+        print("entering preprocScreen")
+
+    def on_leave(self):
+        print("leaving preprocScreen")
+
+
+class EdgedetScreen(Screen):
+    def on_enter(self):
+        print("entering edgedetectScreen")
+
+    def on_leave(self):
+        print("leaving edgedetectScreen")
 
 
 class MainApp(App):
-
-    def goto_preproc_screen(self):
-        pass
-    def goto_edgedetect_screen(self):
-        pass
-    def goto_cam_screen(self):
-        pass
+    def on_touch_down(self, touch):
+        print("main touched at {}".format(touch.pos))
+        return super(MainApp, self).on_touch_down(touch)
 
     def build(self):
         self.manager = ScreenManager()
+        self.manager.add_widget(CamScreen(name="camScreen"))
+        self.manager.add_widget(PreprocScreen(name="preprocScreen"))
+        self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
 
-        cam_view = KivyCamera()
-        cam_screen = Screen(name='camScreen')
-        cam_screen.on_enter(cam_view.start())
-        cam_screen.on_pre_leave(cam_view.stop())
-        cam_screen.add_widget(cam_view)
-        self.manager.add_widget(cam_screen)
+        return self.manager
 
-        preproc = Preproc_Anim()
-        preproc_screen = Screen(name='preprocScreen')
-        preproc_screen.add_widget(preproc)
-        self.manager.add_widget(preproc_screen)
-
-        edge_det = EdgeDetect()
-        edge_det_screen = Screen(name='edgeScreen')
-        edge_det_screen.add_widget(edge_det)
-        self.manager.add_widget(edge_det_screen)
-
-        Clock.schedule_once(self.screen_switch_one, 2)
-        Clock.schedule_once(self.screen_switch_two, 4)
-        Clock.schedule_once(self.screen_switch_three, 6)
-        Clock.schedule_once(self.screen_switch_one, 8)
-
-        layout = FloatLayout()
-        layout.add_widget(self.manager)
-        return layout
-
-    def screen_switch_one(self, dt):
-        self.manager.current = 'camScreen'
-    def screen_switch_two(self, dt):
-        self.manager.current = 'preprocScreen'
-    def screen_switch_three(self, dt):
-        self.manager.current = 'edgeScreen'
 
 MainApp().run()

@@ -1,8 +1,9 @@
 # coding: utf-8
 
 # fullscreen
-# from kivy.config import Config
-# Config.set('graphics', 'fullscreen', 'auto')
+if __name__ == '__main__':
+    from kivy.config import Config
+    Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.graphics import *
 
