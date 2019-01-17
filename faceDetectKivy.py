@@ -88,7 +88,7 @@ class KivyCamera(Image):
 
     def update(self):
         frame = self.videostream.read()
-        # frame = cv2.flip(frame, -1)
+        frame = cv2.flip(frame, -1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # keep all 3 channels:
         # gray = np.dstack([gray, gray, gray])
@@ -104,18 +104,19 @@ class KivyCamera(Image):
             #     cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
 
             self.circle_r = (w + w/2) / 2
-            circle_y = x + w/2
-            circle_x = y + h/2
+            circle_x = x + w/2
+            circle_y = y + h/2
 
 
-            rr, cc = circle(circle_x, circle_y, self.circle_r, frame.shape)
+            rr, cc = circle(circle_y, circle_x, self.circle_r, frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
 
 
             #  TODO:
             # flip :)
 
-            self.circle_pos = self.to_parent(x, y)
+            self.circle_pos = self.to_parent(x+self.circle_r, y+2*self.circle_r)
+            # self.circle_pos = self.to_parent(x+w/2-self.circle_r, y+w/2+self.circle_r)
             # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
@@ -126,9 +127,9 @@ class KivyCamera(Image):
 
         # convert to texture
         # buf1 = cv2.flip(frame, 1)
-        buf1 = cv2.flip(morphed_frame, -1)
+        # buf1 = cv2.flip(morphed_frame, -1)
 
-        buf = buf1.tostring()
+        buf = morphed_frame.tostring()
         # if self.f < 1:
         #     print("type buf1: {}".format(type(buf1)))
         image_texture = Texture.create(
