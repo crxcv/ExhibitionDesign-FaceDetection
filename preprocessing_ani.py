@@ -27,8 +27,55 @@ import numpy as np
 from skimage.transform import pyramid_gaussian
 
 
+Builder.load_string('''
 
-Builder.load_file('preprocessing.kv')
+<Root>:
+    Preproc_Anim
+
+
+<Preproc_Anim>:
+    Image:
+        id: original
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: grey
+        texture: root.create_texture('grey', make_grey=True)
+        pos: 10, root.pos_y
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: blur
+        texture: root.create_texture('blur', make_grey=True)
+        pos: 10, root.pos_y
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: grey2alpha
+        texture: root.create_texture('grey', make_grey=True)
+        pos: 10, root.pos_y
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+
+    Image:
+        id: orig2alpha
+        texture: root.create_texture('orig', is_colored=True)
+        pos: 10, root.pos_y
+        size: root.orig_size
+        allow_stretch: False
+        keep_ratio: True
+
+''')
+# Builder.load_file('preprocessing.kv')
 
 
 class Root(Widget):
@@ -50,6 +97,7 @@ class Preproc_Anim(Widget):
 
     def __init__(self, **kwargs):
         super(Preproc_Anim, self).__init__(**kwargs)
+        self.start()
         # self.img = cv2.imread('images/orig.JPEG')
         # self.img = cv2.flip(self.img, 0)
 
@@ -75,10 +123,12 @@ class Preproc_Anim(Widget):
         texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt=colorfmt)
         texture.blit_buffer(buf, colorfmt=colorfmt, bufferfmt='ubyte')
 
+        # print("texture type of {}: {}".format(img_name, type(texture)))
+
         return texture
 
 
-    def move_ani(self, dt):
+    def move_ani(self, dt=None):
         """ Moves all image instances """
         print("type: {}".format(type(self)))
         print("children: {}".format(self.children))
@@ -91,19 +141,19 @@ class Preproc_Anim(Widget):
         ani.start(self.ids.blur)
         ani.start(self.ids.grey2alpha)
 
-    def alpha_ani(self, dt):
+    def alpha_ani(self, dt=None):
         """ reduces opacity of overlaying original image """
         ani2 = Animation(opacity=0, duration=1, t='in_out_sine')
         ani2.start(self.ids.orig2alpha)
 
-    def move_blur_ani(self, dt):
+    def move_blur_ani(self, dt=None):
         """ moves 2nd grey image and blur image
         """
         ani3 = Animation(x=Window.width-900, duration=1, t='in_out_sine')
         ani3.start(self.ids.blur)
         ani3.start(self.ids.grey2alpha)
 
-    def alpha_blur(self, dt):
+    def alpha_blur(self, dt=None):
         """ reduces opacity of grey image to show blurred image """
 
         ani4 = Animation(opacity=0, duration=1, t='in_out_sine')
@@ -118,6 +168,8 @@ class Preproc_Anim(Widget):
             image = imutils.resize(image, width=w)
             image = cv2.GaussianBlur(image, (5, 5), 0)
             texture = self.create_texture(image=image, is_colored=False)
+
+            # print("texture type of img_pyr {}".format( type(texture)))
 
 
             if image.shape[0] < min_size[1] or image.shape[1] < min_size[0]:
@@ -135,12 +187,40 @@ class Preproc_Anim(Widget):
             # self.img_pyr.append(i)
             self.im_in_pyr += 1
 
-    def pyr_ani(self, dt):
+    def pyr_ani(self, dt=None):
 
+        # self.pyramid(self.img)
         anis = []
+        print("children: {}".format(len(self.children)))
+        grey = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        for (i, resized) in enumerate(pyramid_gaussian(grey, downscale=1.2)):
+
+            if resized.shape[0] < 100 or resized.shape[1] < 100:
+                break
+            print("resizex {}".format(resized.shape))
+
+            # !!!!
+            # https://stackoverflow.com/questions/33299374/opencv-convert-cv-8u-to-cv-64f
+            min = np.min(resized)
+            resized = resized-min #to have only positive values
+            max=np.max(resized)
+            div = max / float(255)
+            img = np.uint8(np.round(resized / div))
+
+            texture = self.create_texture(image=img, is_colored=False)
+
+
+
+            im = Image(source=None)
+            im.texture = texture
+            im.pos = self.ids['blur'].pos
+            im.id = 'pyr_{}'.format(self.im_in_pyr)
+            im.allow_stretch = False
+            self.img_pyr.append(im)
+            self.add_widget(im)
         self.pyramid(self.img)
         print("im in pyr: {}".format(self.im_in_pyr))
-        # for (i, resized) in enumerate(pyramid_gaussian(grey, downscale=2)):
+        # for (i, resized) in enumerate(pyramid_gaussian(self.ids.blur, downscale=2)):
         for i in range(self.im_in_pyr):
             # texture = self.create_texture(image=resized, is_colored=False)
             # if resized.shape[0] < 30 or resized.shape[1] < 30:
@@ -162,8 +242,7 @@ class Preproc_Anim(Widget):
             anis[i].start(self.img_pyr[i])
             # anis[i].start(im)
             i += 1
-
-        # print("IDs: {}".format(self.ids))
+        print("IDs: {}".format(self.ids))
 
     def rescale_pyr(self):
         anis = []
@@ -182,8 +261,23 @@ class Preproc_Anim(Widget):
     def start(self):
         self.ani_dict = {0:self.move_ani , 1:self.alpha_ani, 2:self.move_blur_ani, 3:self.alpha_blur, 4:self.pyr_ani}
 
+    aniNum = 0
+    ani_dict = {0:move_ani , 1:alpha_ani, 2:move_blur_ani, 3:alpha_blur, 4:pyr_ani, 5:rescale_pyr}
+    ani_iter = iter(ani_dict.items())
+
+    def on_touch_down(self, touch):
+        print("touched")
+
+        try:
+            (i, ani) = self.ani_iter.__next__()
+            print("Ani: {}".format(self.ani_dict[i]))
+            ani(self)
+        except StopIteration:
+            pass
+        self.aniNum +=1
+
         for key in self.ani_dict:
-            Clock.schedule_once(self.ani_dict[key], 2+key*2)
+            Clock.schedule_once(self.ani_dict[key], key*2)
     # aniNum = 0
     # ani_dict = {0:move_ani , 1:alpha_ani, 2:move_blur_ani, 3:alpha_blur, 4:pyr_ani}
     # ani_iter = iter(ani_dict.items())

@@ -2,6 +2,7 @@
 
 <Rings>:
     radius: root.radius
+    height: root.height
     canvas:
 
         Color:
@@ -9,6 +10,8 @@
         Line:
             width: 3
             circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+            # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+            # rectangle: self.pos[0], self.pos[1], self.height, self.height
         # Color:
         #     rgb: 0.2588, 0.3725, 0.9569
         # Line:
@@ -22,14 +25,17 @@
 
 
 <KivyCamera>:
-    circle_pos: root.circle_pos
-    circle_r: root.circle_r
-    # texture: root.update()
+    # circle_pos: root.circle_pos
+    # circle_r: root.circle_r
+    # height: root.height
+    # rect_pos: root.rect_pos
+    # # texture: root.update()
 
     Rings:
         id: ring1
-        pos: root.circle_pos
+        pos: root.circle_pos  # root.rect_pos#
         radius: root.circle_r
+        height: root.height
 
 
 # <CamScreen>:

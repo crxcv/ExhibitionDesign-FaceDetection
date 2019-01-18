@@ -123,7 +123,7 @@ class EdgeDetect(Widget):
     name = StringProperty('edgedetectScreen')
     img = cv2.imread('images/orig.JPEG')
     img = cv2.flip(img, 0)
-    print("shape: {}".format(img.shape))
+    print("[edge detect] shape: {}".format(img.shape))
     # img = cv2.resize(img, None, fx=0.7, fy=0.7)
     grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
