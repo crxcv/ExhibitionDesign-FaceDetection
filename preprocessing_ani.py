@@ -50,7 +50,6 @@ class Preproc_Anim(Widget):
 
     def __init__(self, **kwargs):
         super(Preproc_Anim, self).__init__(**kwargs)
-        self.on_start()
         # self.img = cv2.imread('images/orig.JPEG')
         # self.img = cv2.flip(self.img, 0)
 
@@ -141,7 +140,7 @@ class Preproc_Anim(Widget):
         anis = []
         self.pyramid(self.img)
         print("im in pyr: {}".format(self.im_in_pyr))
-        # for (i, resized) in enumerate(pyramid_gaussian(self.ids.blur, downscale=2)):
+        # for (i, resized) in enumerate(pyramid_gaussian(grey, downscale=2)):
         for i in range(self.im_in_pyr):
             # texture = self.create_texture(image=resized, is_colored=False)
             # if resized.shape[0] < 30 or resized.shape[1] < 30:
@@ -164,7 +163,7 @@ class Preproc_Anim(Widget):
             # anis[i].start(im)
             i += 1
 
-        print("IDs: {}".format(self.ids))
+        # print("IDs: {}".format(self.ids))
 
     def rescale_pyr(self):
         anis = []
@@ -180,11 +179,11 @@ class Preproc_Anim(Widget):
 
 
 
-    def on_start(self):
+    def start(self):
         self.ani_dict = {0:self.move_ani , 1:self.alpha_ani, 2:self.move_blur_ani, 3:self.alpha_blur, 4:self.pyr_ani}
 
         for key in self.ani_dict:
-            Clock.schedule_once(self.ani_dict[key], key*2)
+            Clock.schedule_once(self.ani_dict[key], 2+key*2)
     # aniNum = 0
     # ani_dict = {0:move_ani , 1:alpha_ani, 2:move_blur_ani, 3:alpha_blur, 4:pyr_ani}
     # ani_iter = iter(ani_dict.items())

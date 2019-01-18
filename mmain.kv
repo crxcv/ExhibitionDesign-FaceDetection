@@ -3,8 +3,9 @@
 
 
 <Circles>:
-    radius: 100
-    size: 100, 100
+    id: circles
+    radius: 150
+    size: 300, 300
     color: root.color
     # target: root.target
     canvas:
@@ -18,33 +19,38 @@
 <Menu>:
     Circles:
         id: top_left
-        pos: -100, win.height-100
+        pos: -self.radius, win.height-self.radius
         color: 0.502, 0.2588, 0.9569
-        on_release: app.manager.current = 'camScreen'
+        on_press: self.color = [0.402, 0.1588, 0.8569]
+        on_release: app.manager.current = 'camScreen'; print("changing to camScreen"); self.color=[0.502, 0.2588, 0.9569]
     Circles:
         id: top_right
         color: 0.2588, 0.3725, 0.9569
-        pos:  win.width-100, win.height-100
-        on_release: app.manager.current = 'preprocScreen'
+        pos:  win.width-self.radius, win.height-self.radius
+        on_press: self.color = [0.1588, 0.2725, 0.8569]
+        on_release: app.manager.current = 'preprocScreen'; self.color=[ 0.2588, 0.3725, 0.9569]; print("changing to preprocScreen")
     Circles:
         id: bottom_right
         color: 0.2392, 1., 1.
-        pos: win.width-100, -100
-        on_release: app.manager.current = 'edgeScreen'
+        pos: win.width-self.radius, -self.radius
+        on_press: self.color=[0.1392, .9, .9]
+        on_release: app.manager.current = 'edgeScreen'; self.color=[0.2392, 1., 1.];print("changing to edgeScreen")
 
 <CamScreen>:
-    # name: 'camScreen'
+    # name: 'camScreen
     cam: cam
     KivyCamera:
         id: cam
     Menu:
         id: menu
 <PreprocScreen>:
+    preproc: preproc
     # name: 'preprocScreen'
     Preproc_Anim:
         id: preproc
     Menu
 <EdgedetScreen>:
+    edgedet: edgedet
     # name: 'edgedetScreen'
     EdgeDetect:
         id: edgedet

@@ -45,10 +45,8 @@ class ScreenManagement(ScreenManager):
 class CamScreen(Screen):
     cam = ObjectProperty()
 
-    def on_enter(self):
+    def on_pre_enter(self):
         print("entering camscreen")
-        print('ids: {}'.format(self.ids))
-        print('children: {}'.format(self.children))
 
         self.cam.start()
         self.clock = Clock.schedule_interval(self.cam.update, 1/30)
@@ -63,14 +61,17 @@ class CamScreen(Screen):
 
 
 class PreprocScreen(Screen):
+    preproc = ObjectProperty()
     def on_enter(self):
         print("entering preprocScreen")
+        self.preproc.start()
 
     def on_leave(self):
         print("leaving preprocScreen")
 
 
 class EdgedetScreen(Screen):
+    edgedet = ObjectProperty()
     def on_enter(self):
         print("entering edgedetectScreen")
 
