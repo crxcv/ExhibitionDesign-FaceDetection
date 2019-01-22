@@ -1,6 +1,9 @@
 #:import win kivy.core.window
 
 <Rings>:
+    # ####################
+    # # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
+    # #########################
     radius: root.radius
     height: root.height
     canvas:
@@ -36,6 +39,8 @@
         pos: root.circle_pos  # root.rect_pos#
         radius: root.circle_r
         height: root.height
+        on_pos: root.ring_pos()
+        on_size: root.ring_size()
 
 
 # <CamScreen>:

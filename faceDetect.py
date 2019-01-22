@@ -76,6 +76,12 @@ class KivyCamera(Image):
 
         return dst
 
+    # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
+    def ring_pos(self, *args):
+        pass
+
+    def ring_size(self, *args):
+        pass
 
     def update(self, dt):
         frame = self.videostream.read()
@@ -119,10 +125,8 @@ class KivyCamera(Image):
             # morphed_frame[rr, cc] = frame[rr, cc]
 
 
-            # print("rr, cc: {}".format((rr, cc)))
-            # print("shape: {}".format((rr.shape, cc.shape)))
-            # rr, cc: (array([482, 482, 482, ..., 963, 963, 963]), array([534, 535, 536, ..., 553, 554, 555]))
-            # shape: ((182112,), (182112,))
+            # http://robertour.com/2013/07/19/10-things-you-should-know-about-the-kivy-canvas/
+            # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
 
             cx = dp(circle_x+self.circle_r)  #
             cy = dp(circle_y-self.circle_r)  # /2-self.circle_r
