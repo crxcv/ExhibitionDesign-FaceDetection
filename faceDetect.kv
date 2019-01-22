@@ -1,0 +1,112 @@
+#:import win kivy.core.window
+
+<Rings>:
+    # ####################
+    # # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
+    # #########################
+    radius: root.radius
+    height: root.height
+    canvas:
+
+        Color:
+            rgb: 0.502, 0.2588, 0.9569
+        Line:
+            width: 3
+            circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+            # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+            # rectangle: self.pos[0], self.pos[1], self.height, self.height
+        # Color:
+        #     rgb: 0.2588, 0.3725, 0.9569
+        # Line:
+        #     width: 3
+        #     circle: self.pos[0], self.pos[1], self.radius + 10
+        # Color:
+        #     rgb: 0.2392, 1., 1.
+        # Line:
+        #     width: 3
+        #     circle: self.pos[0], self.pos[1], self.radius + 20
+
+
+<KivyCamera>:
+    # circle_pos: root.circle_pos
+    # circle_r: root.circle_r
+    # height: root.height
+    # rect_pos: root.rect_pos
+    # # texture: root.update()
+
+    Rings:
+        id: ring1
+        pos: root.circle_pos  # root.rect_pos#
+        radius: root.circle_r
+        height: root.height
+        on_pos: root.ring_pos()
+        on_size: root.ring_size()
+
+
+# <CamScreen>:
+#     # id: camScreenß
+#     KivyCamera:
+#         id: cam
+
+
+# output coords:
+#
+# c_pos parent coords: (182, 96)
+# circle win-pos parent coords: [1184, 672]
+# img size: (480, 640, 3)
+# x, y of face: 182, 96
+# c_pos parent coords: (187, 104)
+# circle win-pos parent coords: [1179, 664]
+# img size: (480, 640, 3)
+# x, y of face: 187, 104
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (182, 96)
+# circle win-pos parent coords: [1184, 672]
+# img size: (480, 640, 3)
+# x, y of face: 182, 96
+# c_pos parent coords: (167, 96)
+# circle win-pos parent coords: [1199, 672]
+# img size: (480, 640, 3)
+# x, y of face: 167, 96
+# c_pos parent coords: (124, 96)
+# circle win-pos parent coords: [1242, 672]
+# img size: (480, 640, 3)
+
+# blau - fast lila
+# HEX	#425ff4
+# RGB	rgb(66, 95, 244) 0.2588, 0.3725, 0.9569
+# HSV	hsv(230°, 73%, 96%)
+# HSL	hsl(230°, 90%, 61%)
+# CMYK	cmyk(73%, 61%, 0%, 4%)
+
+# lila
+# HEX	#8042f4
+# RGB	rgb(128, 66, 244) 0.502, 0.2588, 0.9569
+# HSV	hsv(261°, 73%, 96%)
+# HSL	hsl(261°, 90%, 61%)
+# CMYK	cmyk(48%, 73%, 0%, 4%)
+
+# pink
+# HEX	#f23dff
+# RGB	rgb(242, 61, 255) 0.9490, 0.2392, 1
+# HSV	hsv(296°, 76%, 100%)
+# HSL	hsl(296°, 100%, 62%)
+# CMYK	cmyk(5%, 76%, 0%, 0%)
+
+# cyan
+# HEX	#3de1ff
+# RGB	rgb(61, 225, 255) 0.2392, 1, 1
+# HSV	hsv(189°, 76%, 100%)
+# HSL	hsl(189°, 100%, 62%)
+# CMYK	cmyk(76%, 12%, 0%, 0%)

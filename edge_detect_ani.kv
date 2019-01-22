@@ -1,0 +1,177 @@
+#:import win kivy.core.window
+
+<EdgeDetect>:
+
+    StencilView:
+        id: stenc_blur
+        pos: 10, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        Picture:
+            id: blur
+            name: 'blur'
+            texture: root.create_texture('blur')
+            pos: 10, 10
+            # scale: root.scale
+            size: root.orig_size
+            do_translation: False
+            do_scale: False
+            on_transform:
+    StencilView:
+        id: stenc_rect
+        pos: 10, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        canvas:
+            Color:
+                rgb: 1., 1., 0
+            Line:
+                rectangle: self.pos[0] + root.rect_pos[0], self.pos[1] + root.rect_pos[1], self.pos[0] + root.rect_size[0], self.pos[0] + root.rect_size[1]
+                id: rect_blur
+
+
+
+
+    StencilView:
+        id: s-sobel_y
+        pos: root.pos_x, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        Picture:
+            id: sobel_y
+            texture: root.create_texture('sobel_y')
+            # name: self.name
+            pos: root.pos_x, 10
+            scale:  root.scale
+            size: root.orig_size
+            allow_stretch: False
+            keep_ratio: True
+            # pos_hint: {'center_x', 'center_y'}
+    StencilView:
+        id: stenc_sy
+        pos: root.pos_x, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        canvas:
+            Color:
+                rgb: 1., 1., 0
+            Line:
+                rectangle: self.pos[0] + root.rect_pos[0], self.pos[1] + root.rect_pos[1], root.rect_size[0], root.rect_size[1]
+                id: rect_sy
+
+    StencilView:
+        id: s-sobel_x
+        pos: root.pos_x, root.pos_y
+        size: root.orig_size  # [1], root.orig_size[0]
+        Picture:
+            id: sobel_x
+            texture: root.create_texture('sobel_x')
+            pos: root.pos_x, root.pos_y
+            size: root.orig_size
+            # scale:  root.scale
+            allow_stretch: False
+            keep_ratio: True
+            # pos_hint: {'center_x', 'center_y'}
+    StencilView:
+        id: stenc_sy
+        pos: root.pos_x, root.pos_y
+        size: root.orig_size  # [1], root.orig_size[0]
+        canvas:
+            Color:
+                rgb: 1., 1., 0
+            Line:
+                rectangle: self.pos[0] + root.rect_pos[0], self.pos[1] + root.rect_pos[1], root.rect_size[0], root.rect_size[1]
+                id: rect_sy
+
+    StencilView:
+        id: mag-s
+        pos: root.pos_x*2, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        Picture:
+            id: mag
+            texture: root.create_texture('mag')
+            pos: root.pos_x*2, 10
+            size: root.orig_size
+            # scale:  root.scale
+            allow_stretch: False
+            keep_ratio: True
+            # pos_hint: {'center_x', 'center_y'}
+    StencilView:
+        id: stenc_mag
+        pos: root.pos_x*2, 10
+        size: root.orig_size  # [1], root.orig_size[0]
+        canvas:
+            Color:
+                rgb: 1., 1., 0
+            Line:
+                rectangle: self.pos[0] + root.rect_pos[0], self.pos[1] + root.rect_pos[1], root.rect_size[0], root.rect_size[1]
+                id: rect_mag
+
+    StencilView:
+        id: s_angle
+        pos: root.pos_x*2, root.pos_y
+        size: root.orig_size  # [1], root.orig_size[0]
+        Picture:
+            id: angle
+            texture: root.create_texture('angle')
+            pos: root.pos_x*2, root.pos_y
+            size: root.orig_size
+            # scale:  root.scale
+            allow_stretch: False
+            keep_ratio: True
+        # pos_hint: {'center_x', 'center_y'}
+    StencilView:
+        id: stenc_angle
+        pos: root.pos_x*2, root.pos_y
+        size: root.orig_size  # [1], root.orig_size[0]
+        canvas:
+            Color:
+                rgb: 1., 1., 0
+            Line:
+                rectangle: self.pos[0] + root.rect_pos[0], self.pos[1] + root.rect_pos[1], root.rect_size[0], root.rect_size[1]
+                id: rect_angle
+
+
+    StencilView:
+        id: stenc_grey
+        pos: 10, root.pos_y
+        size: root.orig_size
+
+        Picture:
+            id: grey
+            name:'grey'
+            texture: root.create_texture('grey')
+            pos: root.pic_pos
+
+            on_pos: root.check_pos(self.pos, self.scale, self.size, self.parent.pos)# print('pic pos: {}, {}'.format(self.pos, self.parent.pos))
+            scale:  root.scale
+            on_scale: root.check_pos(self.pos, self.scale, self.size, self.parent.pos)# print('pic pos: {}, {}'.format(self.pos, self.parent.pos))
+            size: root.orig_size
+            # on_touch_down: root.check_mask_collission(self)
+            # return False if not self.parent.collide_point(touch) else return True
+            do_translation: True
+
+
+
+
+<Picture>:
+    # on_size: self.center = win.Window.center
+    # size: image.size
+    id: root.id
+    # name: root.name
+    # texture: texture
+    # allow_stretch = image.allow_stretch
+    size_hint: 1, 1
+    pos: self.pos
+    do_translation: True
+    do_rotation: False
+
+    Image:
+        id: root.id
+        # source: root.source
+        texture : root.texture
+        size: root.size
+
+        # create initial image to be 400 pixels width
+        # size: 400, 400 / self.image_ratio
+
+        # add shadow background
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
