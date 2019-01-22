@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # fullscreen
 from kivy.config import Config
 Config.set('graphics', 'fullscreen', 'auto')

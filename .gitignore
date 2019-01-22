@@ -12,3 +12,5 @@
 .DS_Store
 preprocessing_ani00.py
 preprocessing_anidd.py
+facedetect0.py
+facedetectKivy0.py
