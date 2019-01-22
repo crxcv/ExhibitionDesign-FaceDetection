@@ -24,7 +24,7 @@ from kivy.clock import Clock
 from kivy.animation import Animation
 
 from kivy.core.window import Window
-from kivy.properties import ObjectProperty, ListProperty, StringProperty
+from kivy.properties import ObjectProperty, ListProperty, StringProperty, NumericProperty
 
 from kivy.uix.screenmanager import Screen
 
@@ -38,6 +38,18 @@ import warnings
 from skimage import img_as_float, img_as_int, img_as_uint, img_as_ubyte
 
 Builder.load_file('edge_detect_ani.kv')
+
+
+class RoundImage(Widget):
+    texture = ObjectProperty(None)
+    h = 350  #ObjectProperty(350)
+    w = int(778 * (h/583))
+    target_w = NumericProperty(w)
+    target_h = NumericProperty(h)
+    x1 = Window.width/4  - h/2
+    y1 = Window.height/3 * 2  - h/2
+    img_x = x1 - ((w - h)/2 )
+    print("win size: {}".format((Window.width, Window.height)))
 
 class Picture(Scatter):
     texture = ObjectProperty(None)
@@ -123,6 +135,15 @@ class EdgeDetect(Widget):
     name = StringProperty('edgedetectScreen')
     img = cv2.imread('images/orig.JPEG')
     img = cv2.flip(img, 0)
+    h = 350  #ObjectProperty(350)
+    w = int(778 * (h/583))
+    target_w = NumericProperty(w)
+    target_h = NumericProperty(h)
+    x1 = Window.width/4  - h/2
+    y1 = Window.height/3 * 2  - h/2
+    img_x = x1 - ((w - h)/2 )
+
+    img = cv2.resize(img, (w, h), cv2.INTER_AREA)
     print("[edge detect] shape: {}".format(img.shape))
     # img = cv2.resize(img, None, fx=0.7, fy=0.7)
     grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -184,37 +205,37 @@ class EdgeDetect(Widget):
 
 
 
-    def on_touch_down(self, touch):
-        # print("id: {},  type: {}".format(self.id, type(self)))
-        # # print("siblings: {}".format(self.parent.children))
-        # print("children: {}".format(self.children))
-        # print("ids: {}".format(self.ids))
-        if self.ids['stenc_blur'].collide_point(*touch.pos):
-            touch.grab(self)
-            touch.grabbed = self.ids['stenc_blur']
-            print("touch in stenc_blur by {}".format(touch.grabbed.children))
-            print(self.grabbed)
-            return  True
-        elif self.ids['stenc_grey'].collide_point(*touch.pos):
-            touch.grab(self)
-            self.grabbed = self.ids['grey']
-            print(self.grabbed)
-            return True
+    # def on_touch_down(self, touch):
+    #     # print("id: {},  type: {}".format(self.id, type(self)))
+    #     # # print("siblings: {}".format(self.parent.children))
+    #     # print("children: {}".format(self.children))
+    #     # print("ids: {}".format(self.ids))
+    #     if self.ids['stenc_blur'].collide_point(*touch.pos):
+    #         touch.grab(self)
+    #         touch.grabbed = self.ids['stenc_blur']
+    #         print("touch in stenc_blur by {}".format(touch.grabbed.children))
+    #         print(self.grabbed)
+    #         return  True
+    #     elif self.ids['stenc_grey'].collide_point(*touch.pos):
+    #         touch.grab(self)
+    #         self.grabbed = self.ids['grey']
+    #         print(self.grabbed)
+    #         return True
 
-        else:
-            print("touch not in parent")
-            return super(EdgeDetect, self).on_touch_down(touch)
+    #     else:
+    #         print("touch not in parent")
+    #         return super(EdgeDetect, self).on_touch_down(touch)
 
-    def on_touch_move(self, touch):
-        if touch.grab_current is self:
-            # print('moving ')
-            self.grabbed.pos = [self.grabbed.pos[0] + touch.dx, self.grabbed.pos[1] + touch.dy]
-            # touch.grabbed.pos.y += touch.dy
+    # def on_touch_move(self, touch):
+    #     if touch.grab_current is self:
+    #         # print('moving ')
+    #         self.grabbed.pos = [self.grabbed.pos[0] + touch.dx, self.grabbed.pos[1] + touch.dy]
+    #         # touch.grabbed.pos.y += touch.dy
 
-    def on_touch_up(self, touch):
-        if touch.grab_current is self:
-            touch.ungrab(self)
-            return True
+    # def on_touch_up(self, touch):
+    #     if touch.grab_current is self:
+    #         touch.ungrab(self)
+    #         return True
 
     def create_texture(self, img_name=None, image=None):
         bufferfmt='ubyte'
