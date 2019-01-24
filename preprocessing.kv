@@ -4,7 +4,7 @@
 
 #:set img_h 350
 #:set img_w 467
-#:set x1 win_width/4  
+#:set x1 win_width/4
 #:set y1 win_height/3 * 2  - img_h/2
 #:set img_x x1 - ((img_w - img_h)/2 )
 
@@ -26,7 +26,7 @@
         Rectangle:
             id: original
             texture: self.texture
-            pos: self.x - ((root.target_w - root.target_h)/2),  self.y 
+            pos: self.x - ((root.target_w - root.target_h)/2),  self.y
             size: self.width, self.height
         StencilUnUse
         StencilPop
@@ -63,21 +63,19 @@
         text: root.text_orig
         center_x: original.center_x -((root.target_w - root.target_h)/2)
         top: win.height/2 - img_h/4
-        text_size: original.h, None
+        text_size: original.h, self.size[1]
         valign: "top"
     Label:
         id: text_grey
         text: root.text_grey
         center_x: grey.center_x -((root.target_w - root.target_h)/2)
         top: win.height/2 - img_h/4
-        text_size: original.h, None
+        text_size: original.h,  self.size[1]
         valign: "top"
     Label:
         id: text_blur
         text: root.text_blur
         center_x: blur.center_x -((root.target_w - root.target_h)/2)
         top: win.height/2 - img_h/4
-        text_size: original.h, None
+        text_size: original.h,  self.size[1]
         valign: "top"
-
-

@@ -4,28 +4,28 @@
     # ####################
     # # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
     # #########################
-    # radius: root.radius
+    radius: root.radius
     height: root.height
     canvas:
-
         Color:
             rgb: 0.502, 0.2588, 0.9569
         Line:
-            width: 3
-            # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
-            # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
-            rectangle: self.pos[0], self.pos[1], self.height, self.height
-        # Color:
-        #     rgb: 0.2588, 0.3725, 0.9569
-        # Line:
-        #     width: 3
-        #     circle: self.pos[0], self.pos[1], self.radius + 10
-        # Color:
-        #     rgb: 0.2392, 1., 1.
-        # Line:
-        #     width: 3
-        #     circle: self.pos[0], self.pos[1], self.radius + 20
+            width: 5
+            circle: self.pos[0], self.pos[1], self.radius
+            # rectangle: self.pos[0], self.pos[1], self.height, self.height
+        Color:
+            rgb: 0.2588, 0.3725, 0.9569
+        Line:
+            width: 5
+            circle: self.pos[0], self.pos[1], self.radius + 10
+        Color:
+            rgb: 0.2392, 1., 1.
+        Line:
+            width: 5
+            circle: self.pos[0], self.pos[1], self.radius + 20
 
+# circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+# circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
 
 <KivyCamera>:
     coords_left: root.coords_left
@@ -33,6 +33,8 @@
     coords_right: root.coords_right
     coords_top: root.coords_top
     widths: root.widths
+    circle_r: root.circle_r
+    circle_c: root.coords_center
 
 
 

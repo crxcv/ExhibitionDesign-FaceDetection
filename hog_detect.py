@@ -140,7 +140,7 @@ class Hog_Anim(Widget):
         # self.ids.hog_cut.canvas.ask_update()
 
     def populate_texture(self):
-        print("populate_texture")
+        # print("populate_texture")
         image = self.ids.hog_cut
         self.texture_mini = self.texture.get_region(self.rect_x, self.rect_y, self.face1_width, self.face1_width)
         # texture.blit_buffer(buf, (self.face1_width, self.face1_width), colorfmt='luminance', pos=(self.rect_x, self.rect_y))

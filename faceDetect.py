@@ -42,6 +42,7 @@ class KivyCamera(Image):
     coords_bottom = ListProperty()
     coords_right = ListProperty()
     coords_top = ListProperty()
+    coords_center = ListProperty()
     widths = ListProperty()
 
 
@@ -59,7 +60,9 @@ class KivyCamera(Image):
 
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        # self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        frame = self.videostream.read()
+        print("frame size; {}".format(frame.shape))
 
 
 
@@ -103,9 +106,13 @@ class KivyCamera(Image):
         # print("shape frame {}".format(frame.shape))
 
         #  (1024, 1280, 3) 583, 778  1.756, 1.645   0.52539, 0,6078125
-        self.coords_lb = []
-        self.coords_tr = []
+        self.coords_left = []
+        self.coords_right = []
+        self.coords_bottom = []
+        self.coords_top = []
         self.widths = []
+        self.coords_center = []
+        self.circle_c = []
 
         for (i, face) in enumerate(faces):
             # shape = self.predictor(gray, face)
@@ -121,28 +128,32 @@ class KivyCamera(Image):
             rr, cc = circle(circle_y, circle_x, self.circle_r, morphed_frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
             # morphed_frame[rr, cc] = frame[rr, cc]
+            self.coords_left.append(frame.shape[1] - face.right() )
+            self.coords_right.append(frame.shape[1] - face.left())
+            self.coords_top.append(frame.shape[0] - face.top())
+            self.coords_bottom.append(frame.shape[0] - face.bottom())
+            self.widths.append(face.width())
 
+            print("lb: {}".format((self.coords_left, self.coords_bottom)))
+            print("rt: {}".format((self.coords_right, self.coords_top)))
+            c0 = self.coords_left[i] + (int(face.width()/2))
+            c1 = self.coords_bottom[i] + (int(face.width()/2))
+            self.circle_c.append([c0, c1])
+
+            print("lb: {}".format((self.coords_left, self.coords_bottom)))
+            print("rt: {}".format((self.coords_right, self.coords_top)))
 
             # http://robertour.com/2013/07/19/10-things-you-should-know-about-the-kivy-canvas/
             # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
 
-            cx = dp(circle_x+self.circle_r)  #
-            cy = dp(circle_y-self.circle_r)  # /2-self.circle_r
 
-
-
-            self.circle_r = dp(self.circle_r)  # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
 
             # frame = face_utils.visualize_facial_landmarks(morphed_frame, shape)
 
         # if not faces:
-        self.coords_left = [frame.shape[1] - face.left() for face in faces]
-        self.coords_bottom=[(frame.shape[0] - face.bottom()) for face in faces]
-        self.coords_right = [frame.shape[1] - face.right() for face in faces]
-        self.coords_top = [frame.shape[0] - face.top() for face in faces]
-        self.widths= [face.width() for face in faces]
+
 
         # convert to texture
         # buf1 = cv2.flip(frame, 1)
@@ -192,7 +203,7 @@ class CameraScreen(Widget):
         print("win size: {}".format((Window.width, Window.height)))
 
         self.fps = FPS().start()
-        self.cam = KivyCamera( size=(778, 583),
+        self.cam = KivyCamera(size=(1280, 1024),
                               center_x=Window.width/2,
                               center_y=Window.height/2)
         self.cam.start()
@@ -200,8 +211,8 @@ class CameraScreen(Widget):
         Clock.schedule_interval(self.update, 1.0 / 30)
 
         self.add_widget(self.cam)
-        self.rect = Rings()
-        self.add_widget(self.rect)
+        self.circle = Rings()
+        self.add_widget(self.circle)
 
 
     def update(self, dt):
@@ -209,9 +220,11 @@ class CameraScreen(Widget):
         self.cam.update(dt)
         if self.cam.widths:
             for i in range(len(self.cam.widths)):
-                self.rect.pos = (self.cam.x + self.cam.coords_left[i], self.cam.y + self.cam.coords_bottom[i])
-                self.rect.height = self.cam.widths[i]
-                # self.add_widget(ring)
+                self.circle.pos = (self.cam.x + self.cam.circle_c[i][0],
+                                   self.cam.y + self.cam.circle_c[i][1])
+                self.circle.radius = self.cam.circle_r
+                print("rect pos: {}".format(self.circle.pos))
+                print("cam pos: {}".format(self.cam.pos))
 
     def destroy(self):
         self.cam.stop()
