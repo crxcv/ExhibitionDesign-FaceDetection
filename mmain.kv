@@ -19,27 +19,33 @@
 <Menu>:
     Circles:
         id: top_left
-        pos: -self.radius, win.height-self.radius
+        pos: -self.radius, -self.radius
         color: 0.502, 0.2588, 0.9569
         on_press: self.color = [0.402, 0.1588, 0.8569]
         on_release: app.manager.current = 'camScreen'; print("changing to camScreen"); self.color=[0.502, 0.2588, 0.9569]
+    Circles:
+        id: top_left
+        pos: -self.radius, win.height-self.radius
+        color: 0.502, 0.2588, 0.9569
+        on_press: self.color = [0.402, 0.1588, 0.8569]
+        on_release: app.manager.current = 'preprocScreen'; print("changing to camScreen"); self.color=[0.502, 0.2588, 0.9569]
     Circles:
         id: top_right
         color: 0.2588, 0.3725, 0.9569
         pos:  win.width-self.radius, win.height-self.radius
         on_press: self.color = [0.1588, 0.2725, 0.8569]
-        on_release: app.manager.current = 'preprocScreen'; self.color=[ 0.2588, 0.3725, 0.9569]; print("changing to preprocScreen")
+        on_release: app.manager.current = 'edgeScreen'; self.color=[ 0.2588, 0.3725, 0.9569]; print("changing to preprocScreen")
     Circles:
         id: bottom_right
         color: 0.2392, 1., 1.
         pos: win.width-self.radius, -self.radius
         on_press: self.color=[0.1392, .9, .9]
-        on_release: app.manager.current = 'edgeScreen'; self.color=[0.2392, 1., 1.];print("changing to edgeScreen")
+        on_release: app.manager.current = 'hogScreen'; self.color=[0.2392, 1., 1.];print("changing to edgeScreen")
 
 <CamScreen>:
     # name: 'camScreen
     cam: cam
-    KivyCamera:
+    CameraScreen:
         id: cam
     Menu:
         id: menu
@@ -59,3 +65,4 @@
     hog: hog
     Hog_Detect:
         id: hog
+    Menu

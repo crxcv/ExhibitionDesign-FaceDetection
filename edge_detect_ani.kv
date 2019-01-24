@@ -4,7 +4,7 @@
 
 #:set img_h 350
 #:set img_w 467
-#:set x1 win_width/4  
+#:set x1 win_width/4
 #:set y1 win_height/3 * 2  - img_h/2
 #:set img_x x1 - ((img_w - img_h)/2 )
 
@@ -26,7 +26,7 @@
         Rectangle:
             id: original
             texture: self.texture
-            pos: self.x - ((root.target_w - root.target_h)/2),  self.y 
+            pos: self.x - ((root.target_w - root.target_h)/2),  self.y
             size: self.width, self.height
         StencilUnUse
         StencilPop
@@ -61,8 +61,15 @@
         pos: root.pos_x*2, root.pos_y
         size: root.orig_size  # [1], root.orig_size[0]
         texture: root.create_texture('angle')
-
-#
+    Label:
+        id: header
+        font_size: 30
+        text: "Kantenerkennung"
+        center_x: win_width/2
+        top: win_height - 20
+    Label:
+        id: sobel
+        #
 #    StencilView:
 #        id: mag-s
 #        pos: root.pos_x*2, 10

@@ -15,11 +15,12 @@ from kivy.clock import Clock
 # local libraries
 from edge_detect_ani import EdgeDetect
 from preprocessing_ani import Preproc_Anim
-from faceDetect import KivyCamera
+from faceDetect import CameraScreen
 from hog_detect import Hog_Detect
 
 
 root_widget = Builder.load_file('mmain.kv')
+
 
 
 class Circles(ButtonBehavior, Widget):
@@ -55,7 +56,7 @@ class CamScreen(Screen):
 
     def on_leave(self):
         print("leaving camscreen")
-        self.cam.stop()
+        # self.cam.stop()
 
     # def on_touch_down(self, touch):
     #     print("CamScreen touched at {}".format(touch.pos))
@@ -100,7 +101,7 @@ class MainApp(App):
 
     def build(self):
         self.manager = ScreenManager()
-        self.manager.add_widget(CamScreen(name="camScreen"))
+        self.manager.add_widget(CameraScreen(name="camScreen"))
         self.manager.add_widget(PreprocScreen(name="preprocScreen"))
         self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
         self.manager.add_widget(HogScreen(name="hogScreen"))

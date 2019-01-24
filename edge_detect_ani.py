@@ -144,7 +144,7 @@ class EdgeDetect(Widget):
     img_x = x1 - ((w - h)/2 )
 
     img = cv2.resize(img, (w, h), cv2.INTER_AREA)
-    print("[edge detect] shape: {}".format(img.shape))
+    # print("[edge detect] shape: {}".format(img.shape))
     # img = cv2.resize(img, None, fx=0.7, fy=0.7)
     grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -185,23 +185,26 @@ class EdgeDetect(Widget):
     rect_h = ObjectProperty(0)
     rect_w = ObjectProperty(0)
 
+    text_sobel = "Eine Methode zur Kantenerkennung wird mithilfe des"
+    text_sobel += " Sobel-Operators erreicht"
+
     def get_pos(self):
         return self.rect_pos[0], se
 
     def check_pos(self, *args):
         img_pos, img_scale, img_size, stenc_pos = [i for i in args]
-        print("check pos {}".format(args))
+        # print("check pos {}".format(args))
         self.scale = img_scale
 
         self.rect_size = [i * 1/img_scale for i in img_size]
 
         # p = img_pos - tuple(stenc_pos) #
-        print("p: {}, {}".format(img_pos[0] - stenc_pos[0], img_pos[1] - stenc_pos[1]))
+        # print("p: {}, {}".format(img_pos[0] - stenc_pos[0], img_pos[1] - stenc_pos[1]))
         p = [stenc_pos[0] - img_pos[0], stenc_pos[1] - img_pos[1]]  # [i-j for i, j in (img_pos, stenc_pos)]# tuple((img_pos[0] - stenc_pos[0], img_pos[1] - stenc_pos[1]))
         self.rect_pos= [i * 1/img_scale for i in p]
         # self.rect_pos = [self.blur_pos[0] + self.rect_pos[0], self.blur_pos[1] + self.rect_pos[1]]  # [i + j for i, j in (self.blur_pos, self.rect_pos)]
 
-        print("rect pos, size; {}, {}".format(self.rect_pos, self.rect_size))
+        # print("rect pos, size; {}, {}".format(self.rect_pos, self.rect_size))
 
 
 

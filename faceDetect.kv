@@ -4,7 +4,7 @@
     # ####################
     # # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
     # #########################
-    radius: root.radius
+    # radius: root.radius
     height: root.height
     canvas:
 
@@ -12,9 +12,9 @@
             rgb: 0.502, 0.2588, 0.9569
         Line:
             width: 3
-            circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
             # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
-            # rectangle: self.pos[0], self.pos[1], self.height, self.height
+            # circle: (self.pos[0]+ self.radius), (self.pos[1]+ self.radius), self.radius
+            rectangle: self.pos[0], self.pos[1], self.height, self.height
         # Color:
         #     rgb: 0.2588, 0.3725, 0.9569
         # Line:
@@ -28,60 +28,20 @@
 
 
 <KivyCamera>:
-    # circle_pos: root.circle_pos
-    # circle_r: root.circle_r
-    # height: root.height
-    # rect_pos: root.rect_pos
-    # # texture: root.update()
-
-    Rings:
-        id: ring1
-        pos: root.circle_pos  # root.rect_pos#
-        radius: root.circle_r
-        height: root.height
-        on_pos: root.ring_pos()
-        on_size: root.ring_size()
+    coords_left: root.coords_left
+    coords_bottom: root.coords_bottom
+    coords_right: root.coords_right
+    coords_top: root.coords_top
+    widths: root.widths
 
 
-# <CamScreen>:
-#     # id: camScreenß
-#     KivyCamera:
-#         id: cam
 
 
-# output coords:
-#
-# c_pos parent coords: (182, 96)
-# circle win-pos parent coords: [1184, 672]
-# img size: (480, 640, 3)
-# x, y of face: 182, 96
-# c_pos parent coords: (187, 104)
-# circle win-pos parent coords: [1179, 664]
-# img size: (480, 640, 3)
-# x, y of face: 187, 104
-# c_pos parent coords: (167, 96)
-# circle win-pos parent coords: [1199, 672]
-# img size: (480, 640, 3)
-# x, y of face: 167, 96
-# c_pos parent coords: (167, 96)
-# circle win-pos parent coords: [1199, 672]
-# img size: (480, 640, 3)
-# x, y of face: 167, 96
-# c_pos parent coords: (167, 96)
-# circle win-pos parent coords: [1199, 672]
-# img size: (480, 640, 3)
-# x, y of face: 167, 96
-# c_pos parent coords: (182, 96)
-# circle win-pos parent coords: [1184, 672]
-# img size: (480, 640, 3)
-# x, y of face: 182, 96
-# c_pos parent coords: (167, 96)
-# circle win-pos parent coords: [1199, 672]
-# img size: (480, 640, 3)
-# x, y of face: 167, 96
-# c_pos parent coords: (124, 96)
-# circle win-pos parent coords: [1242, 672]
-# img size: (480, 640, 3)
+
+<CamScreen>:
+
+
+
 
 # blau - fast lila
 # HEX	#425ff4

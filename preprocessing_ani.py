@@ -107,7 +107,7 @@ class Preproc_Anim(Widget):
             colorfmt = 'luminance'
 
         if img_name == "blur":
-            img = cv2.GaussianBlur(img, (5, 5), 0)
+            img = cv2.GaussianBlur(img, (7, 7), 0)
 
         buf = img.tostring()
         texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt=colorfmt)

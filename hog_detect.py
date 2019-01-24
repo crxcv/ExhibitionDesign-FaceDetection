@@ -105,7 +105,7 @@ class Hog_Anim(Widget):
 
     spacing = 20
     size = [img_size[0]+ hog_face_size[0] + spacing, img_size[1]+spacing]
-    print("widgetsize: {}".format(size))
+    # print("widgetsize: {}".format(size))
     print("im_size: {}".format(img_size))
     # print("local size: {}".format(FloatLayout.to_local(size[0], size[1], relative=True)))
     layoutSize = ListProperty(size)

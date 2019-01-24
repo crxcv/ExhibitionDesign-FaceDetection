@@ -37,8 +37,12 @@ class KivyCamera(Image):
     circle_pos = ListProperty([0, 0])
     # circle_y = NumericProperty(0)
     circle_r = NumericProperty(0)
-    height = NumericProperty(0)
     rect_pos = ListProperty([0, 0])
+    coords_left = ListProperty()
+    coords_bottom = ListProperty()
+    coords_right = ListProperty()
+    coords_top = ListProperty()
+    widths = ListProperty()
 
 
     def __init__(self,  **kwargs):
@@ -87,20 +91,21 @@ class KivyCamera(Image):
 
     def update(self, dt):
         frame = self.videostream.read()
-        # frame = cv2.flip(frame, -1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        print("shape frame {}".format(frame.shape))
-        print("shape grey {}".format(gray.shape))
 
-        print("color depth: {}".format(gray.dtype))
+        #
+        # print("color depth: {}".format(gray.dtype))
         # keep all 3 channels:
         # gray = np.dstack([gray, gray, gray])
         faces = self.detector(gray, 1)
         morphed_frame = self.morphology_transform(frame.copy())
-        print("shape morphed frame {}".format(morphed_frame.shape))
-        print("shape frame {}".format(frame.shape))
+        # print("shape morphed frame {}".format(morphed_frame.shape))
+        # print("shape frame {}".format(frame.shape))
 
         #  (1024, 1280, 3) 583, 778  1.756, 1.645   0.52539, 0,6078125
+        self.coords_lb = []
+        self.coords_tr = []
+        self.widths = []
 
         for (i, face) in enumerate(faces):
             # shape = self.predictor(gray, face)
@@ -108,19 +113,10 @@ class KivyCamera(Image):
             (x, y, w, h) = face_utils.rect_to_bb(face)
             # for (x, y) in shape:
             #     cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
-            print("x, y, w, h: {}".format((x, y, w, h)))
-            # print("left, top, right, bottom: {}".format((face.left(), face.top(), face.right(), face.bottom())))
-            # print("bl, tl, tr, br, c: {}".format((face.bl_corner(), face.tl_corner(), face.tr_corner(), face.br_corner(), face.center())))
-            #  left, top, right, bottom: (847, 455, 1168, 776)
-            # bl, tl, tr, br, c: (point(847, 776), point(847, 455), point(1168, 455), point(1168, 776), point(1008, 616))
             self.circle_r = (w + w / 2)/2
-            self.height = dp(h)
             self.rect_pos = [face.right()/2, face.top()/2]
             circle_x = (x + w / 2)
             circle_y = (y + h / 2)
-
-            print('circle r: {}'.format(self.circle_r))
-            print('circle r in px: {}'.format(dp(self.circle_r)))
 
             rr, cc = circle(circle_y, circle_x, self.circle_r, morphed_frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
@@ -133,20 +129,20 @@ class KivyCamera(Image):
             cx = dp(circle_x+self.circle_r)  #
             cy = dp(circle_y-self.circle_r)  # /2-self.circle_r
 
-            self.circle_r = dp(self.circle_r)
-            print("cx, cy in dp: {}".format((dp(cx), dp(cy))))
-            print("shape in px: {}".format((dp(frame.shape[1]), dp(frame.shape[0]))))
-            self.circle_pos = self.to_window(frame.shape[1]-cx, frame.shape[0]-cy)
-            # self.circle_pos = self.to_window(frame.shape[1] - circle_x, frame.shape[0] - circle_y)
-            # self.circle_pos = self.to_window(x+w/2-self.circle_r, y+w/2+self.circle_r)
-            # print("x, y: {}, {}\nx, y widget {}\ncx, cy: {}, {}\ncx/y parent: {}\ncx/y to window: {}".format(x, y, self.to_widget(x, y), circle_x, circle_y, self.to_parent(circle_x, circle_y), self.to_window(circle_x, circle_y)))
-            # face_img = frame[y:y+h, x:x+w]
+
+
+            self.circle_r = dp(self.circle_r)  # face_img = frame[y:y+h, x:x+w]
             # face_img = self.morphology_transform(face_img)
             # morphed_frame[y:y+h, x:x+w] = face_img
 
             # frame = face_utils.visualize_facial_landmarks(morphed_frame, shape)
 
         # if not faces:
+        self.coords_left = [frame.shape[1] - face.left() for face in faces]
+        self.coords_bottom=[(frame.shape[0] - face.bottom()) for face in faces]
+        self.coords_right = [frame.shape[1] - face.right() for face in faces]
+        self.coords_top = [frame.shape[0] - face.top() for face in faces]
+        self.widths= [face.width() for face in faces]
 
         # convert to texture
         # buf1 = cv2.flip(frame, 1)
@@ -188,19 +184,34 @@ class Rings(Widget):
     #         print("circle in rings: {}".format(self.pos))
 
 
-class CamScreen(FloatLayout):
+class CameraScreen(Widget):
 
     def __init__(self, **kwargs):
-        super(CamScreen, self).__init__(**kwargs)
+        super(CameraScreen, self).__init__(**kwargs)
+
+        print("win size: {}".format((Window.width, Window.height)))
+
         self.fps = FPS().start()
-        self.cam = KivyCamera()
+        self.cam = KivyCamera( size=(778, 583),
+                              center_x=Window.width/2,
+                              center_y=Window.height/2)
         self.cam.start()
         print("facedect.py camscreen init")
         Clock.schedule_interval(self.update, 1.0 / 30)
 
+        self.add_widget(self.cam)
+        self.rect = Rings()
+        self.add_widget(self.rect)
+
+
     def update(self, dt):
         # print("screen ids: {}".format(self.ids))
         self.cam.update(dt)
+        if self.cam.widths:
+            for i in range(len(self.cam.widths)):
+                self.rect.pos = (self.cam.x + self.cam.coords_left[i], self.cam.y + self.cam.coords_bottom[i])
+                self.rect.height = self.cam.widths[i]
+                # self.add_widget(ring)
 
     def destroy(self):
         self.cam.stop()
@@ -208,7 +219,7 @@ class CamScreen(FloatLayout):
 
 class CamApp(App):
     def build(self):
-        self.screen = CamScreen()
+        self.screen = CameraScreen()
         return self.screen
 
     def on_stop(self):

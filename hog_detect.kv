@@ -11,13 +11,13 @@
 <RoundImage>:
     texture: None
     size: root.target_w, root.target_h
-    canvas.before:
-        Color:
-            rgba: 0, 1, 1, .5
-        Rectangle:
-            # self here refers to the widget i.e FloatLayout
-            pos: self.pos
-            size: self.size
+    # canvas.before:
+    #     Color:
+    #         rgba: 0, 1, 1, .5
+    #     Rectangle:
+    #         # self here refers to the widget i.e FloatLayout
+    #         pos: self.pos
+    #         size: self.size
     canvas:
         StencilPush
         Ellipse:
@@ -38,13 +38,13 @@
 <Hog_Anim>:
     id: anim
     size: root.layoutSize
-    canvas.before:
-        Color:
-            rgba: 0, 1, 0, .1
-        Rectangle:
-            # self here refers to the widget i.e FloatLayout
-            pos: anim.pos
-            size: anim.size
+    # canvas.before:
+    #     Color:
+    #         rgba: 0, 1, 0, .1
+    #     Rectangle:
+    #         # self here refers to the widget i.e FloatLayout
+    #         pos: anim.pos
+    #         size: anim.size
     StencilView:
         id: im_stenc
         pos: anim.x + 10, anim.y + int((root.layoutSize[1] - root.img_size[1])/2)

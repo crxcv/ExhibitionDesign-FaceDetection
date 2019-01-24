@@ -1,0 +1,7 @@
+beschreibung = "Durch die Kantendetektion wird versucht, flächige Bereiche auf "
+beschreibung += "einem Bild voneinander zu trennen, wenn sie sich ausreichend "
+beschreibung += "in Farb- oder Grauwert, Helligkeit oder Textur voneinander unterscheiden."
+
+"Häufig wird hierfür der Sobel-Operator eingesetzt. "
+Dieser vergleicht die Helligkeitswerte benachbarter Pixel jeweils in x- und y-Richtung miteinander.
+So erscheinen zusammenhängende Flächen dunkel, während alle Kanten durch helle Farben hervorgehoben werden.
