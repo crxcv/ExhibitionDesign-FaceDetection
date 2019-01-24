@@ -240,7 +240,7 @@ class EdgeDetect(Widget):
     def create_texture(self, img_name=None, image=None):
         bufferfmt='ubyte'
         colorfmt = 'luminance'
-
+        # http://scikit-image.org/docs/dev/api/skimage.exposure.html?highlight=rescale_intensity#skimage.exposure.rescale_intensity
         if image is None:
             img = self.img
         else:

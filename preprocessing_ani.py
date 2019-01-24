@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # coding: utf-8
 
 # fullscreen
@@ -14,12 +15,10 @@ from kivy.graphics import *
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.stencilview import StencilView
+# from kivy.uix.stencilview import StencilView
 import kivy.graphics.stencil_instructions
-from kivy.factory import Factory
 from kivy.graphics.texture import Texture
 
-from kivy.clock import Clock
 from kivy.animation import Animation
 
 from kivy.core.window import Window
@@ -49,7 +48,7 @@ class RoundImage(Widget):
 
 
 class Preproc_Anim(Widget):
-    
+
     img = ObjectProperty()
     img = cv2.imread('images/orig.JPEG')
     img = cv2.flip(img, 0)
@@ -57,12 +56,12 @@ class Preproc_Anim(Widget):
     w = int(img.shape[1] * (h/img.shape[0]))
     target_w = ObjectProperty(w)
     target_h = ObjectProperty(h)
-    
+
     x1 = Window.width/4
     x2 = x1*2 -h/2
     x3 = x1*3 -h/2
     img_x = x1 - ((w - h)/2 )
-    
+
     img = cv2.resize(img, (w, h), cv2.INTER_AREA)
     print("ing size: {}".format(img.shape))
 
@@ -179,7 +178,7 @@ class Preproc_Anim(Widget):
             # self.img_pyr.append(i)
             self.im_in_pyr += 1
 
-    
+
     def pyr_gaussian(self):
         grey = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         for (i, resized) in enumerate(pyramid_gaussian(grey, downscale=1.2)):

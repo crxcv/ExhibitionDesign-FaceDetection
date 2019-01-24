@@ -1,0 +1,103 @@
+#:import win kivy.core.window.Window
+#:set win_height win.height
+#:set win_width win.width
+
+#:set img_h 350
+#:set img_w 467
+#:set x1 win_width/4
+#:set y1 win_height/3 * 2  - img_h/2
+#:set img_x x1 - ((img_w - img_h)/2 )
+
+<RoundImage>:
+    texture: None
+    size: root.target_w, root.target_h
+    canvas.before:
+        Color:
+            rgba: 0, 1, 1, .5
+        Rectangle:
+            # self here refers to the widget i.e FloatLayout
+            pos: self.pos
+            size: self.size
+    canvas:
+        StencilPush
+        Ellipse:
+            pos: self.pos
+            size: self.height, self.height
+        StencilUse
+        Rectangle:
+            id: original
+            texture: self.texture
+            pos: self.x - ((root.target_w - root.target_h)/2),  self.y
+            size: self.width, self.height
+        StencilUnUse
+        Ellipse:
+            pos: self.pos
+            size: self.height, self.height
+        StencilPop
+
+<Hog_Anim>:
+    id: anim
+    size: root.layoutSize
+    canvas.before:
+        Color:
+            rgba: 0, 1, 0, .1
+        Rectangle:
+            # self here refers to the widget i.e FloatLayout
+            pos: anim.pos
+            size: anim.size
+    StencilView:
+        id: im_stenc
+        pos: anim.x + 10, anim.y + int((root.layoutSize[1] - root.img_size[1])/2)
+        size: root.img_size[0], root.img_size[1]
+        rect_x: self.x + root.rect_x
+        rect_y: self.y + root.rect_y
+        canvas.after:
+            Color:
+                id: color_rect
+                rgba: (0.3, 0.8, 0.5, 1) if root.face_found is True else (0.6, 0.2, 0.5, 1)
+            Line:
+                id: rect
+                rectangle: im_stenc.x + root.rect_x, im_stenc.y + root.rect_y, root.face1_width, root.face1_width
+
+        Image:
+            # size_hint: 1, 1
+            id: hog_img
+            pos: im_stenc.pos
+            size: root.img_size
+            texture: root.texture
+
+
+    Image:
+        id: hog_cut
+        # source: 'images/hog_face.png'
+        size: root.hog_face_size
+        top: anim.y + anim.size[1]
+        right: anim.x + anim.size[0]
+        allow_stretch: True
+        texture: root.texture.get_region(root.rect_x, root.rect_y, root.face1_width, root.face1_width)
+        # on_texture: print("on_text"); root.populate_texture()
+        # ; self.texture.ask_update()
+        # pos_hint: {'y': 1, 'right': 1}
+        #pos: win_width/2, win_height/4
+    Image:
+        id: hog_face
+        source: 'images/hog_face.png'
+        size: root.hog_face_size
+        y: anim.y
+        right: anim.x +anim.size[0]
+        # pos_hint: {'y': .5, 'right': .5}
+        #pos: win_width/2, win_height/4
+
+<Hog_Detect>:
+    RoundImage:
+        id: hog
+        pos_hint: {'center_x': 0.5, 'center_y':0.75}# x1*2 - img_h/2, y1
+        size_hint: None, None
+        # center_x: win_width/2
+        # center_y: win_height/4 *3
+        # size: root.target_w, root.target_h
+        texture: root.texture  # create_texture('hog', make_grey=True)
+    Hog_Anim:
+        pos_hint: {'center_x': 0.5, 'center_y':0.25}# x1*2 - img_h/2, y1
+        size_hint: None, None
+        # pos: 0, 0

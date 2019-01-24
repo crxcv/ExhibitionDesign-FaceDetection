@@ -16,6 +16,7 @@ from kivy.clock import Clock
 from edge_detect_ani import EdgeDetect
 from preprocessing_ani import Preproc_Anim
 from faceDetect import KivyCamera
+from hog_detect import Hog_Detect
 
 
 root_widget = Builder.load_file('mmain.kv')
@@ -63,6 +64,7 @@ class CamScreen(Screen):
 
 class PreprocScreen(Screen):
     preproc = ObjectProperty()
+
     def on_enter(self):
         print("entering preprocScreen")
         self.preproc.start()
@@ -73,11 +75,22 @@ class PreprocScreen(Screen):
 
 class EdgedetScreen(Screen):
     edgedet = ObjectProperty()
+
     def on_enter(self):
         print("entering edgedetectScreen")
 
     def on_leave(self):
         print("leaving edgedetectScreen")
+
+
+class HogScreen(Screen):
+    hog = ObjectProperty()
+
+    def on_enter(self):
+        print("entering hogScreen")
+
+    def on_leave(self):
+        print("leaving hogScreen")
 
 
 class MainApp(App):
@@ -90,6 +103,7 @@ class MainApp(App):
         self.manager.add_widget(CamScreen(name="camScreen"))
         self.manager.add_widget(PreprocScreen(name="preprocScreen"))
         self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
+        self.manager.add_widget(HogScreen(name="hogScreen"))
 
         return self.manager
 
