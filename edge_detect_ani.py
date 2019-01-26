@@ -6,7 +6,6 @@ if __name__ == '__main__':
     Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.graphics import *
-
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.base import runTouchApp
@@ -31,7 +30,6 @@ from kivy.uix.screenmanager import Screen
 import cv2
 import dlib
 import numpy as np
-import time
 
 import warnings
 

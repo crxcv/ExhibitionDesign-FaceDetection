@@ -7,11 +7,6 @@ if __name__ == '__main__':
     Config.set('graphics', 'fullscreen', 'auto')
 
 
-import cv2
-import numpy as np
-from imutils import face_utils, paths
-from imutils.object_detection import non_max_suppression
-from imutils.video import FPS, WebcamVideoStream
 from kivy.app import App
 from kivy.clock import Clock
 
@@ -28,7 +23,18 @@ from skimage.draw import circle
 
 from kivy.metrics import *
 
+import cv2
 import dlib
+import numpy as np
+from imutils import face_utils, paths
+from imutils.object_detection import non_max_suppression
+from imutils.video import FPS, WebcamVideoStream
+
+from skimage import exposure
+from skimage import feature
+
+import time
+import random
 
 Builder.load_file('faceDetect.kv')
 
@@ -48,6 +54,7 @@ class KivyCamera(Image):
 
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
+        # self.start()
 
     def start(self):
         # self.videostream = capture
@@ -61,8 +68,14 @@ class KivyCamera(Image):
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         # self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-        frame = self.videostream.read()
-        print("frame size; {}".format(frame.shape))
+        # frame = self.videostream.read()
+        # print("frame size; {}".format(frame.shape))
+
+        self.sec = time.time()
+        self.last_sec = self.sec
+        self.random_s = random.randint(1, 10)
+
+        self.cam_screens = [self.sobel_cam, self.angle_cam, self.mag_cam, self.hog_cam]
 
 
 
@@ -92,6 +105,56 @@ class KivyCamera(Image):
     def ring_size(self, *args):
         pass
 
+
+    def sobel_cam(self, gray):
+        blur = cv2.medianBlur(gray, 11)
+        sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
+        sx = np.absolute(sobelx)
+        sx = np.uint8(sx)
+        # sobelx = 255 - sobelx
+        sy = np.absolute(sobely)
+        sy = np.uint8(sobely)
+
+        sx = np.dstack([sx, sx, sx])
+        return sx
+
+    def angle_cam(self, gray):
+        blur = cv2.medianBlur(gray, 11)
+        sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
+        angle = np.arctan2(sobely, sobelx) * (180 / np.pi)
+        # angle = np.absolute(angle)
+        angle = np.uint8(angle)
+        angle = np.dstack([angle, angle, angle])
+        return angle
+
+    def mag_cam(self, gray):
+        blur = cv2.medianBlur(gray, 11)
+        sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
+        mag = np.sqrt(sobelx**2.0 + sobely**2.0)
+        mag = np.absolute(mag)
+        mag = np.uint8(mag)
+        mag = np.dstack([mag, mag, mag])
+        return mag
+
+    def hog_cam(self, gray):
+        (H, hogImage) = feature.hog(gray, orientations=9,
+                                    pixels_per_cell=(8, 8),
+                                    cells_per_block=(8, 8),
+                                    transform_sqrt=True,
+                                    block_norm="L1",
+                                    visualize=True)
+
+        hogImage = exposure.rescale_intensity(hogImage, out_range=(0, 255))
+        hogImage = hogImage.astype('uint8')
+
+        hogImage = np.dstack([hogImage, hogImage, hogImage])
+
+        return hogImage
+
+
     def update(self, dt):
         frame = self.videostream.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -102,16 +165,26 @@ class KivyCamera(Image):
         # gray = np.dstack([gray, gray, gray])
         faces = self.detector(gray, 1)
         morphed_frame = self.morphology_transform(frame.copy())
+
+        self.sec = time.time()
+        if (self.sec - self.last_sec) >= self.random_s:
+            func = random.randint(0, 4)
+            self.last_sec = self.sec
+            self.random_s = random.randint(2, 10)
+
+            if func == 4:
+                self.random_s = random.randint(10, 20)
+            else:
+                if func == 3:
+                    self.random_s = 1
+                morphed_frame = self.cam_screens[func](gray)
         # print("shape morphed frame {}".format(morphed_frame.shape))
         # print("shape frame {}".format(frame.shape))
 
         #  (1024, 1280, 3) 583, 778  1.756, 1.645   0.52539, 0,6078125
         self.coords_left = []
-        self.coords_right = []
         self.coords_bottom = []
-        self.coords_top = []
         self.widths = []
-        self.coords_center = []
         self.circle_c = []
 
         for (i, face) in enumerate(faces):
@@ -129,19 +202,13 @@ class KivyCamera(Image):
             morphed_frame[rr, cc] = frame[rr, cc]
             # morphed_frame[rr, cc] = frame[rr, cc]
             self.coords_left.append(frame.shape[1] - face.right() )
-            self.coords_right.append(frame.shape[1] - face.left())
-            self.coords_top.append(frame.shape[0] - face.top())
             self.coords_bottom.append(frame.shape[0] - face.bottom())
             self.widths.append(face.width())
 
-            print("lb: {}".format((self.coords_left, self.coords_bottom)))
-            print("rt: {}".format((self.coords_right, self.coords_top)))
             c0 = self.coords_left[i] + (int(face.width()/2))
             c1 = self.coords_bottom[i] + (int(face.width()/2))
             self.circle_c.append([c0, c1])
 
-            print("lb: {}".format((self.coords_left, self.coords_bottom)))
-            print("rt: {}".format((self.coords_right, self.coords_top)))
 
             # http://robertour.com/2013/07/19/10-things-you-should-know-about-the-kivy-canvas/
             # https://blog.kivy.org/2014/01/positionsize-of-widgets-in-kivy/
@@ -199,16 +266,19 @@ class CameraScreen(Widget):
 
     def __init__(self, **kwargs):
         super(CameraScreen, self).__init__(**kwargs)
-
+    # def build(self):
         print("win size: {}".format((Window.width, Window.height)))
 
+        self.start()
+
+    def start(self):
         self.fps = FPS().start()
         self.cam = KivyCamera(size=(1280, 1024),
                               center_x=Window.width/2,
                               center_y=Window.height/2)
         self.cam.start()
         print("facedect.py camscreen init")
-        Clock.schedule_interval(self.update, 1.0 / 30)
+        Clock.schedule_interval(self.update, 1.0 / 20)
 
         self.add_widget(self.cam)
         self.circle = Rings()
@@ -223,8 +293,6 @@ class CameraScreen(Widget):
                 self.circle.pos = (self.cam.x + self.cam.circle_c[i][0],
                                    self.cam.y + self.cam.circle_c[i][1])
                 self.circle.radius = self.cam.circle_r
-                print("rect pos: {}".format(self.circle.pos))
-                print("cam pos: {}".format(self.cam.pos))
 
     def destroy(self):
         self.cam.stop()

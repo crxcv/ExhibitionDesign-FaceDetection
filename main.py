@@ -4,11 +4,12 @@ from kivy.config import Config
 Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.app import App
+from kivy.animation import Animation
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-from kivy.properties import ListProperty, StringProperty, ObjectProperty
+from kivy.properties import ListProperty, StringProperty, ObjectProperty, BooleanProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 
@@ -25,6 +26,22 @@ root_widget = Builder.load_file('mmain.kv')
 
 class Circles(ButtonBehavior, Widget):
     color = ListProperty([1., 1., 1.])
+    make_bigger = BooleanProperty(True)
+
+    def toggle_button_behavior(self):
+
+        if self.make_bigger:
+            print("bigger")
+            anim = Animation(size=(600, 600), radius=300, t='in_elastic', duration=.2)
+            anim.start(self)
+
+            self.make_bigger = False
+        else:
+            self.make_bigger = True
+            anim = Animation(size=(300, 300), radius=150, t='out_elastic', duration=.2)
+            anim.start(self)
+            # MainApp.manager.current = screen_name
+            print("changing to camScreen")
     # target = ObjectProperty(None)
 
     # def on_touch_down(self, touch):
@@ -52,7 +69,7 @@ class CamScreen(Screen):
         print("entering camscreen")
 
         self.cam.start()
-        self.clock = Clock.schedule_interval(self.cam.update, 1/30)
+        # self.clock = Clock.schedule_interval(self.cam.update, 1/30)
 
     def on_leave(self):
         print("leaving camscreen")
@@ -101,7 +118,7 @@ class MainApp(App):
 
     def build(self):
         self.manager = ScreenManager()
-        self.manager.add_widget(CameraScreen(name="camScreen"))
+        self.manager.add_widget(CamScreen(name="camScreen"))
         self.manager.add_widget(PreprocScreen(name="preprocScreen"))
         self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
         self.manager.add_widget(HogScreen(name="hogScreen"))
