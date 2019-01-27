@@ -20,6 +20,7 @@ from faceDetect import CameraScreen
 from hog_detect import Hog_Detect
 
 
+
 root_widget = Builder.load_file('mmain.kv')
 
 
@@ -65,6 +66,7 @@ class ScreenManagement(ScreenManager):
 class CamScreen(Screen):
     cam = ObjectProperty()
 
+
     def on_pre_enter(self):
         print("entering camscreen")
 
@@ -73,7 +75,7 @@ class CamScreen(Screen):
 
     def on_leave(self):
         print("leaving camscreen")
-        # self.cam.stop()
+        self.cam.destroy()
 
     # def on_touch_down(self, touch):
     #     print("CamScreen touched at {}".format(touch.pos))
@@ -118,8 +120,8 @@ class MainApp(App):
 
     def build(self):
         self.manager = ScreenManager()
-        self.manager.add_widget(CamScreen(name="camScreen"))
         self.manager.add_widget(PreprocScreen(name="preprocScreen"))
+        self.manager.add_widget(CamScreen(name="camScreen"))
         self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
         self.manager.add_widget(HogScreen(name="hogScreen"))
 

@@ -35,6 +35,7 @@ from skimage import feature
 
 import time
 import random
+import threading
 
 Builder.load_file('faceDetect.kv')
 
@@ -266,45 +267,58 @@ class CameraScreen(Widget):
 
     def __init__(self, **kwargs):
         super(CameraScreen, self).__init__(**kwargs)
-    # def build(self):
+        # threading.Thread.__init__(self)
+        # def build(self):
         print("win size: {}".format((Window.width, Window.height)))
+        self.is_running = False
 
-        self.start()
+        # self.start()
 
     def start(self):
+        self.is_running = True
+        # t = threading.Thread(target=self.start)
+        #
+        # t.start()
         self.fps = FPS().start()
         self.cam = KivyCamera(size=(1280, 1024),
                               center_x=Window.width/2,
                               center_y=Window.height/2)
         self.cam.start()
         print("facedect.py camscreen init")
-        Clock.schedule_interval(self.update, 1.0 / 20)
+        self.update_scheduler = Clock.schedule_interval(self.update, 1.0 / 20)
 
         self.add_widget(self.cam)
         self.circle = Rings()
         self.add_widget(self.circle)
 
 
+
     def update(self, dt):
         # print("screen ids: {}".format(self.ids))
-        self.cam.update(dt)
-        if self.cam.widths:
-            for i in range(len(self.cam.widths)):
-                self.circle.pos = (self.cam.x + self.cam.circle_c[i][0],
-                                   self.cam.y + self.cam.circle_c[i][1])
-                self.circle.radius = self.cam.circle_r
+        if self.is_running:
+            self.cam.update(dt)
+            if self.cam.widths:
+                for i in range(len(self.cam.widths)):
+                    self.circle.pos = (self.cam.x + self.cam.circle_c[i][0],
+                                       self.cam.y + self.cam.circle_c[i][1])
+                    self.circle.radius = self.cam.circle_r
+        else:
+            self.destroy()
 
     def destroy(self):
+        self.is_running = False
         self.cam.stop()
+        self.update_scheduler.cancel()
 
 
 class CamApp(App):
     def build(self):
-        self.screen = CameraScreen()
-        return self.screen
+        self.cam = CameraScreen()
+        self.cam.start()
+        return self.cam
 
     def on_stop(self):
-        self.screen.destroy()
+        self.cam.destroy()
 
 
 if __name__ == '__main__':

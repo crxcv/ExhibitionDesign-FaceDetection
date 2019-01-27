@@ -23,7 +23,7 @@
         id: top_left
         pos: 0, 0
         color: 0.502, 0.2588, 0.9569
-        on_press: self.color = [0.402, 0.1588, 0.8569]
+        on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
             self.color=[0.502, 0.2588, 0.9569]
             if self.make_bigger: pass
@@ -32,10 +32,12 @@
     Circles:
         id: top_left
         pos: 0, win.height
-        color: 0.502, 0.2588, 0.9569
-        on_press: self.color = [0.402, 0.1588, 0.8569]; print("clicked camScreen")
+        color: 0.2588, 0.502, 0.9569
+        on_press:
+            self.color = [0.4, 0.4, 0.4]
+            print("clicked camScreen")
         on_release:
-            self.color=[0.502, 0.2588, 0.9569]
+            self.color=[0.2588, 0.502, 0.9569]
             if self.make_bigger: pass
             else: app.manager.current = 'preprocScreen'
             self.toggle_button_behavior()
@@ -43,7 +45,7 @@
         id: top_right
         color: 0.2588, 0.3725, 0.9569
         pos:  win.width, win.height
-        on_press: self.color = [0.1588, 0.2725, 0.8569]
+        on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
             self.color=[ 0.2588, 0.3725, 0.9569]
             if self.make_bigger: pass
@@ -54,7 +56,7 @@
         id: bottom_right
         color: 0.2392, 1., 1.
         pos: win.width, 0
-        on_press: self.color=[0.1392, .9, .9]
+        on_press: self.color=[0.4, .4, .4]
         on_release:
             self.color=[0.2392, 1., 1.]
             if self.make_bigger: pass
