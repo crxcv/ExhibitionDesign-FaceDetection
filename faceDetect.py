@@ -60,7 +60,10 @@ class KivyCamera(Image):
 
     def start(self):
         # self.videostream = capture
-        self.videostream = cv2.VideoCapture(0)
+        self.videostream = cv2.VideoCapture(1)
+        if not self.videostream.isOpened():
+            self.videostream = cv2.VideoCapture(0)
+            
         self.videostream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.videostream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         # self.videostream = WebcamVideoStream(0).start()
