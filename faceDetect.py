@@ -53,13 +53,17 @@ class KivyCamera(Image):
     widths = ListProperty()
 
 
+
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
         # self.start()
 
     def start(self):
         # self.videostream = capture
-        self.videostream = WebcamVideoStream(0).start()
+        self.videostream = cv2.VideoCapture(0)
+        self.videostream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.videostream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        # self.videostream = WebcamVideoStream(0).start()
         # Clock.schedule_interval(self.update, 1.0/30)
         print("starting video capture")
         self.detector = dlib.get_frontal_face_detector()
@@ -157,7 +161,7 @@ class KivyCamera(Image):
 
 
     def update(self, dt):
-        frame = self.videostream.read()
+        ret, frame = self.videostream.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         #
@@ -202,7 +206,7 @@ class KivyCamera(Image):
             rr, cc = circle(circle_y, circle_x, self.circle_r, morphed_frame.shape)
             morphed_frame[rr, cc] = frame[rr, cc]
             # morphed_frame[rr, cc] = frame[rr, cc]
-            self.coords_left.append(frame.shape[1] - face.right() )
+            self.coords_left.append(frame.shape[1] - face.right())
             self.coords_bottom.append(frame.shape[0] - face.bottom())
             self.widths.append(face.width())
 
@@ -241,7 +245,7 @@ class KivyCamera(Image):
         # self.f += 1
     def stop(self):
         print("stopping video capture")
-        self.videostream.stop()
+        self.videostream.release()
 
     # def on_touch_down(self, touch):
     #     print("KivyCamera touched at {}".format(touch.pos))
@@ -280,7 +284,7 @@ class CameraScreen(Widget):
         #
         # t.start()
         self.fps = FPS().start()
-        self.cam = KivyCamera(size=(1280, 1024),
+        self.cam = KivyCamera(size=(1920, 1080),
                               center_x=Window.width/2,
                               center_y=Window.height/2)
         self.cam.start()
@@ -290,8 +294,6 @@ class CameraScreen(Widget):
         self.add_widget(self.cam)
         self.circle = Rings()
         self.add_widget(self.circle)
-
-
 
     def update(self, dt):
         # print("screen ids: {}".format(self.ids))
