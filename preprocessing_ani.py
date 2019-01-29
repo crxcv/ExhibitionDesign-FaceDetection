@@ -14,7 +14,7 @@ from kivy.graphics import *
 
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
-from kivy.uix.floatlayout import FloatLayout
+# from kivy.uix.floatlayout import FloatLayout
 # from kivy.uix.stencilview import StencilView
 import kivy.graphics.stencil_instructions
 from kivy.graphics.texture import Texture

@@ -2,7 +2,7 @@
 #:import clock kivy.clock.Clock
 
 
-<Circles>:
+<CircleButton>:
     id: circles
     radius: 150
     size: 300, 300
@@ -19,7 +19,7 @@
             size:  self.radius*2, self.radius*2
 
 <Menu>:
-    Circles:
+    CircleButton:
         id: top_left
         pos: 0, 0
         color: 0.502, 0.2588, 0.9569
@@ -29,7 +29,7 @@
             if self.make_bigger: pass
             else: app.manager.current = "camScreen"
             self.toggle_button_behavior()
-    Circles:
+    CircleButton:
         id: top_left
         pos: 0, win.height
         color: 0.2588, 0.502, 0.9569
@@ -41,7 +41,7 @@
             if self.make_bigger: pass
             else: app.manager.current = 'preprocScreen'
             self.toggle_button_behavior()
-    Circles:
+    CircleButton:
         id: top_right
         color: 0.2588, 0.3725, 0.9569
         pos:  win.width, win.height
@@ -52,7 +52,7 @@
             else: app.manager.current = 'edgeScreen'
             self.toggle_button_behavior()
             print("changing to preprocScreen")
-    Circles:
+    CircleButton:
         id: bottom_right
         color: 0.2392, 1., 1.
         pos: win.width, 0

@@ -171,13 +171,13 @@ class KivyCamera(Image):
         if (self.sec - self.last_sec) >= self.random_s:
             func = random.randint(0, 4)
             self.last_sec = self.sec
-            self.random_s = random.randint(2, 10)
+            self.random_s = random.randint(10, 15)
 
             if func == 4:
                 self.random_s = random.randint(10, 20)
             else:
                 if func == 3:
-                    self.random_s = 1
+                    self.random_s = 5
                 morphed_frame = self.cam_screens[func](gray)
         # print("shape morphed frame {}".format(morphed_frame.shape))
         # print("shape frame {}".format(frame.shape))

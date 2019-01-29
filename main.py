@@ -25,7 +25,7 @@ root_widget = Builder.load_file('mmain.kv')
 
 
 
-class Circles(ButtonBehavior, Widget):
+class CircleButton(ButtonBehavior, Widget):
     color = ListProperty([1., 1., 1.])
     make_bigger = BooleanProperty(True)
 
@@ -46,13 +46,13 @@ class Circles(ButtonBehavior, Widget):
     # target = ObjectProperty(None)
 
     # def on_touch_down(self, touch):
-    #     # print("Circles touched at {}".format(touch.pos))
+    #     # print("CircleButton touched at {}".format(touch.pos))
     #
     #     if self.collide_point(*touch.pos):
     #         self.pressed = touch.pos
     #         print('circle {} pressed at {}'.format(self.id, touch.pos))
     #         return True  # self.on_touch_up()
-    #     return super(Circles, self).on_touch_down(touch)
+    #     return super(CircleButton, self).on_touch_down(touch)
 
 
 class Menu(Widget):
@@ -87,7 +87,7 @@ class PreprocScreen(Screen):
 
     def on_enter(self):
         print("entering preprocScreen")
-        self.preproc.start()
+        # self.preproc.start()
 
     def on_leave(self):
         print("leaving preprocScreen")
