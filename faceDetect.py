@@ -33,11 +33,61 @@ from imutils.video import FPS, WebcamVideoStream
 from skimage import exposure
 from skimage import feature
 
+import sys
 import time
 import random
-import threading
+from queue import Queue
+from threading import Thread
 
 Builder.load_file('faceDetect.kv')
+
+
+class ThreadedVideoStream:
+
+    def __init__(self, path, frame_width=1920, frame_height=1080, queueSize=128):
+        # initialize the file video stream along with the boolean
+        # used to indicate if the thread should be stopped or not
+
+        self.videostream = cv2.VideoCapture(path)
+
+        self.videostream.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
+        self.videostream.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
+        (self.grabbed, self.frame) = self.videostream.read()
+        self.stopped = False
+
+        # initialize the queue used to store frames read from
+        # the video file
+        # self.Q = Queue(maxsize=queueSize)
+
+    def start(self):
+        # start a thread to read frames from the file video stream
+        t = Thread(target=self.update, args=())
+        t.daemon = True
+        t.start()
+        return self
+
+    def update(self):
+        # if not self.Q.full():
+        while True:
+            if self.stoped:
+                return
+
+            (self.grabbed, self.frame) = self.videostream.read()
+            # if not ret:
+            #     self.stop()
+            #     return
+            # self.Q.put(frame)
+
+    def read(self):
+        return self.frame
+
+    # def more(self):
+    #     # return True if there are still frames in the queue
+    #     return self.Q.qsize() > 0
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
 
 
 class KivyCamera(Image):
@@ -52,22 +102,15 @@ class KivyCamera(Image):
     coords_center = ListProperty()
     widths = ListProperty()
 
-
-
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
         # self.start()
 
     def start(self):
         # self.videostream = capture
-        self.videostream = cv2.VideoCapture(1)
-        if not self.videostream.isOpened():
-            self.videostream = cv2.VideoCapture(0)
-            
-        self.videostream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.videostream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        # self.videostream = WebcamVideoStream(0).start()
-        # Clock.schedule_interval(self.update, 1.0/30)
+        self.videostream = ThreadedVideoStream(0)
+
+
         print("starting video capture")
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(
@@ -83,13 +126,15 @@ class KivyCamera(Image):
         self.last_sec = self.sec
         self.random_s = random.randint(1, 10)
 
-        self.cam_screens = [self.sobel_cam, self.angle_cam, self.mag_cam, self.hog_cam]
-
-
+        self.cam_screens = [self.sobel_cam, self.angle_cam,
+                            self.mag_cam, self.hog_cam]
 
     def morphology_transform(self, img, morph_operator=2, element=1, ksize=18):
-        morph_op_dic = {0: cv2.MORPH_OPEN, 1: cv2.MORPH_CLOSE,
-                        2: cv2.MORPH_GRADIENT, 3: cv2.MORPH_TOPHAT, 4: cv2.MORPH_BLACKHAT}
+        morph_op_dic = {0: cv2.MORPH_OPEN,
+                        1: cv2.MORPH_CLOSE,
+                        2: cv2.MORPH_GRADIENT,
+                        3: cv2.MORPH_TOPHAT,
+                        4: cv2.MORPH_BLACKHAT}
 
         if element == 0:
             morph_elem = cv2.MORPH_RECT
@@ -112,7 +157,6 @@ class KivyCamera(Image):
 
     def ring_size(self, *args):
         pass
-
 
     def sobel_cam(self, gray):
         blur = cv2.medianBlur(gray, 11)
@@ -162,9 +206,8 @@ class KivyCamera(Image):
 
         return hogImage
 
-
     def update(self, dt):
-        ret, frame = self.videostream.read()
+        frame = self.videostream.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         #
@@ -248,7 +291,7 @@ class KivyCamera(Image):
         # self.f += 1
     def stop(self):
         print("stopping video capture")
-        self.videostream.release()
+        self.videostream.stop()
 
     # def on_touch_down(self, touch):
     #     print("KivyCamera touched at {}".format(touch.pos))
