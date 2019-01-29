@@ -28,7 +28,6 @@
         name: "br"
         color: 0.2392, 1., 1.
         center: win.width, 0
-        # target: app.manager.current = 'hogScreen'
         on_press: self.color=[0.4, .4, .4]
         on_release:
             self.color=[0.2392, 1., 1.]
@@ -40,7 +39,6 @@
         id: bottom_left
         name: "bl"
         center: 0, 0
-        # target: app.manager.current = "camScreen"
         color: 0.502, 0.2588, 0.9569
         on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
@@ -51,7 +49,6 @@
     CircleButton:
         id: top_left
         name: "tl"
-        # target: app.manager.current = 'preprocScreen'
         center: 0, win.height
         color: 0.2588, 0.502, 0.9569
         on_press:

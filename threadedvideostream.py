@@ -51,3 +51,4 @@ class ThreadedVideoStream:
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
+        self.videostream.release()

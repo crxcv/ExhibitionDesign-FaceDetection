@@ -60,6 +60,7 @@ class KivyCamera(Image):
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
         # self.start()
+    
 
     def start(self):
         # self.videostream = capture

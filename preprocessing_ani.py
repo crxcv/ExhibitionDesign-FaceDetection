@@ -14,8 +14,10 @@ from kivy.graphics import *
 
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 # from kivy.uix.floatlayout import FloatLayout
 # from kivy.uix.stencilview import StencilView
+from kivy.uix.modalview import ModalView
 import kivy.graphics.stencil_instructions
 from kivy.graphics.texture import Texture
 
@@ -91,6 +93,10 @@ class Preproc_Anim(Widget):
         # self.img = cv2.imread('images/orig.JPEG')
         # self.img = cv2.flip(self.img, 0)
 
+    # def on_touch_down(self, touch):
+    #     print("Preproc) touched at {}".format(touch.pos))
+    #     # return super(Preproc_Anim, self).on_touch_down(touch)
+    #     return True
 
     def create_texture(self, img_name=None, image=None, is_colored=False, make_grey=False):
         if image is None:

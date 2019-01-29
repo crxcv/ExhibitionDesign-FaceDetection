@@ -32,6 +32,17 @@
         StencilPop
 
 <Preproc_Anim>:
+    Button:
+        size_hint: None, None
+        center: win.width/2, win.height/4
+        size: 100, 50
+        on_state: print("pressed")
+        # on_touch_down:
+        #     print("pressed")
+        on_press:
+            modal.open()
+            print("button pressed")
+        text: "popup"
     RoundImage:
         id: blur
         pos: x1*3- img_h/2, y1
@@ -79,3 +90,13 @@
         top: win.height/2 - img_h/4
         text_size: original.h,  self.size[1]
         valign: "top"
+
+    ModalView:
+        id: modal
+        size_hint: .5, .5
+        canvas:
+            Color:
+                rgb: 1, 1, 1, .9
+            Ellipse:
+                pos: self.pos
+                size: self.size

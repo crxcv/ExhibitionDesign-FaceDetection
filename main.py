@@ -11,7 +11,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.properties import ListProperty, StringProperty, ObjectProperty, BooleanProperty
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.popup import Popup
 from kivy.clock import Clock
 
 # local libraries
@@ -33,14 +32,13 @@ class CircleButton(ButtonBehavior, Widget):
 
     def __init__(self, **kwargs):
         super(CircleButton, self).__init__(**kwargs)
-        self.popup = Popup(title="test", size_hint=(.5, .5))
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             print("Touched!!!")
             print("CircleButton {} touched at {}".format(self.name, touch.pos))
             self.trigger_action()
-            pass
+
         else:
             return super(CircleButton, self).on_touch_down(touch)
 
@@ -48,15 +46,12 @@ class CircleButton(ButtonBehavior, Widget):
 
         if self.make_bigger:
             print("bigger")
-            # self.popup.open()
             x, y = self.x, self.y
             if self.name == 'tl' or self.name == 'tr':
                 y = self.y - 300
             if self.name == 'tr' or self.name == 'br':
-            #     y = self.y - 150
                 x = self.x - 300
-            # if self.name == 'br':
-                # x = self.x - 150
+
             anim = Animation(size=(600, 600), radius=300, x=x, y=y, t='in_elastic', duration=.4)
             anim.start(self)
 
@@ -67,24 +62,12 @@ class CircleButton(ButtonBehavior, Widget):
             if self.name == 'tl' or self.name == 'tr':
                 y = self.y + 300
             if self.name == 'tr' or self.name == 'br':
-            #     y = self.y + 150
                 x = self.x + 300
-            # elif self.name == 'br':
-            #     x = self.x + 150
+
             anim = Animation(size=(300, 300), radius=150, x=x, y=y, t='out_elastic', duration= .4)
             anim.start(self)
             # MainApp.manager.current = screen_name
             print("changing to camScreen")
-    # target = ObjectProperty(None)
-
-    # def on_touch_down(self, touch):
-    #     # print("CircleButton touched at {}".format(touch.pos))
-    #
-    #     if self.collide_point(*touch.pos):
-    #         self.pressed = touch.pos
-    #         print('circle {} pressed at {}'.format(self.id, touch.pos))
-    #         return True  # self.on_touch_up()
-    #     return super(CircleButton, self).on_touch_down(touch)
 
 
 class Menu(Widget):
@@ -93,9 +76,6 @@ class Menu(Widget):
     #     print("Menu touched at {}".format(touch.pos))
     #     return super(Menu, self).on_touch_down(touch)
 
-
-class ScreenManagement(ScreenManager):
-    pass
 
 
 class CamScreen(Screen):
@@ -124,7 +104,8 @@ class PreprocScreen(Screen):
     preproc = ObjectProperty()
     # def on_touch_down(self, touch):
     #     print("PreprocScreen(Screen) touched at {}".format(touch.pos))
-    #     return super(PreprocScreen, self).on_touch_down(touch)
+    #     # return super(PreprocScreen, self).on_touch_down(touch)
+    #     return True
 
     def on_enter(self):
         print("entering preprocScreen")
