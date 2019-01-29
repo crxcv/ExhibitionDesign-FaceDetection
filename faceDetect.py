@@ -59,7 +59,7 @@ class KivyCamera(Image):
 
     def start(self):
         # self.videostream = capture
-        self.videostream = WebcamVideoStream(0).start()
+        self.videostream = WebcamVideoStream(1).start()
         # Clock.schedule_interval(self.update, 1.0/30)
         print("starting video capture")
         self.detector = dlib.get_frontal_face_detector()
