@@ -12,7 +12,8 @@ from kivy.animation import Animation
 from kivy.uix.modalview import ModalView
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-from kivy.properties import ListProperty, StringProperty, ObjectProperty, BooleanProperty
+from kivy.properties import (ListProperty, StringProperty, ObjectProperty,
+                             BooleanProperty, NumericProperty)
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 
@@ -33,9 +34,17 @@ class CircleButton(ButtonBehavior, Widget):
     color = ListProperty([1., 1., 1.])
     make_bigger = BooleanProperty(True)
     target = ObjectProperty()
+    # origin_pos = ListProperty()
+    # animated_pos = ListProperty()
+    # size_bigger = NumericProperty(300)
+    is_animating = BooleanProperty()
+    name = StringProperty()
 
     def __init__(self, **kwargs):
         super(CircleButton, self).__init__(**kwargs)
+        self.origin_pos = self.pos
+        self.animated_pos = self.origin_pos
+        self.is_animating = False
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
@@ -46,32 +55,50 @@ class CircleButton(ButtonBehavior, Widget):
         else:
             return super(CircleButton, self).on_touch_down(touch)
 
+    def toggle_button(self, anim, widget):
+        self.is_animating = not self.is_animating
+
     def toggle_button_behavior(self):
+        if not self.is_animating:
+            if self.make_bigger:
+                print("bigger")
+                x, y = self.x, self.y
+                if self.name == 'tl' or self.name == 'tr':
+                    y = self.y - 300
+                if self.name == 'tr' or self.name == 'br':
+                    x = self.x - 300
+                anim = Animation(size=(600, 600), radius=300,
+                                 x=x,
+                                 y=y,
+                                 t='in_elastic', duration=.4)
+                # anim = Animation(size=(600, 600), radius=300,
+                #                  x=self.animated_pos[0],
+                #                  y=self.animated_pos[1],
+                #                  t='in_elastic', duration=.4)
+                anim.bind(on_start=self.toggle_button,
+                          on_complete=self.toggle_button)
 
-        if self.make_bigger:
-            print("bigger")
-            x, y = self.x, self.y
-            if self.name == 'tl' or self.name == 'tr':
-                y = self.y - 300
-            if self.name == 'tr' or self.name == 'br':
-                x = self.x - 300
+                anim.start(self)
 
-            anim = Animation(size=(600, 600), radius=300, x=x, y=y,
-                             t='in_elastic', duration=.4)
-            anim.start(self)
-
-            self.make_bigger = False
-        else:
-            self.make_bigger = True
-            x, y = self.x, self.y
-            if self.name == 'tl' or self.name == 'tr':
-                y = self.y + 300
-            if self.name == 'tr' or self.name == 'br':
-                x = self.x + 300
-
-            anim = Animation(size=(300, 300), radius=150, x=x, y=y,
-                             t='out_elastic', duration=.4)
-            anim.start(self)
+                self.make_bigger = False
+            else:
+                self.make_bigger = True
+                x, y = self.x, self.y
+                if self.name == 'tl' or self.name == 'tr':
+                    y = self.y + 300
+                if self.name == 'tr' or self.name == 'br':
+                    x = self.x + 300
+                anim = Animation(size=(300, 300), radius=150,
+                                 x=x,
+                                 y=y,
+                                 t='out_elastic', duration=.4)
+                anim.bind(on_start=self.toggle_button,
+                          on_complete=self.toggle_button)
+                # anim = Animation(size=(300, 300), radius=150,
+                #                  x=self.origin_pos[0],
+                #                  y=self.origin_pos[1],
+                #                  t='out_elastic', duration=.4)
+                anim.start(self)
 
 
 class Menu(Widget):
