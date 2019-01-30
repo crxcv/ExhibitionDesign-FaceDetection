@@ -160,12 +160,6 @@ class Hog_Anim(Widget):
     #     Clock.schedule_interval(self.move_rect, 1.0/15)
 
 
-
-
-
-
-
-
 class Hog_Detect(FloatLayout):
     img = ObjectProperty()
     img = cv2_img

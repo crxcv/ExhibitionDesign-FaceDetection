@@ -85,15 +85,30 @@
     # name: 'preprocScreen'
     Preproc_Anim:
         id: preproc
-    Menu
+    Menu:
+    Button:
+        size_hint: None, None
+        center: win.width/2, win.height/4
+        size: 100, 50
+        text: "open popup"
+        on_press: app.manager.preproc_popup()
+    # ModalView:
+    #     id: modal
+    #     size_hint: .5, .5
+    #     canvas:
+    #         Color:
+    #             rgb: 1, 1, 1, .9
+    #         Ellipse:
+    #             pos: self.pos
+    #             size: self.size
 <EdgedetScreen>:
     edgedet: edgedet
     # name: 'edgedetScreen'
     EdgeDetect:
         id: edgedet
-    Menu
+    Menu:
 <HogScreen>:
     hog: hog
     Hog_Detect:
         id: hog
-    Menu
+    Menu:

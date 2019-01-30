@@ -33,6 +33,7 @@
 
 <Preproc_Anim>:
     Button:
+        id: btn
         size_hint: None, None
         center: win.width/2, win.height/4
         size: 100, 50
@@ -90,13 +91,3 @@
         top: win.height/2 - img_h/4
         text_size: original.h,  self.size[1]
         valign: "top"
-
-    ModalView:
-        id: modal
-        size_hint: .5, .5
-        canvas:
-            Color:
-                rgb: 1, 1, 1, .9
-            Ellipse:
-                pos: self.pos
-                size: self.size

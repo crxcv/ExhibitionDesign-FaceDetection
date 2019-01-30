@@ -93,10 +93,13 @@ class Preproc_Anim(Widget):
         # self.img = cv2.imread('images/orig.JPEG')
         # self.img = cv2.flip(self.img, 0)
 
-    # def on_touch_down(self, touch):
-    #     print("Preproc) touched at {}".format(touch.pos))
-    #     # return super(Preproc_Anim, self).on_touch_down(touch)
-    #     return True
+    def on_touch_down(self, touch):
+        print("Preproc) touched at {}".format(touch.pos))
+        # print(self.ids)
+        if self.ids.btn.collide_point(*touch.pos):
+            print("touched button")
+            self.ids.btn.trigger_action()
+        return super(Preproc_Anim, self).on_touch_down(touch)
 
     def create_texture(self, img_name=None, image=None, is_colored=False, make_grey=False):
         if image is None:
