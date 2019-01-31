@@ -5,6 +5,7 @@ Config.set('graphics', 'fullscreen', 'auto')
 
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
@@ -29,12 +30,15 @@ from shadow_circle import MaterialWidget
 
 root_widget = Builder.load_file('mmain.kv')
 
-
+class More_Button(ButtonBehavior, Image):
+    pass
 
 class CircleButton(ButtonBehavior, Widget):
     color = ListProperty([1., 1., 1.])
     make_bigger = BooleanProperty(True)
-    target = ObjectProperty()
+    button_more = ObjectProperty()
+    # app = App.get_running_app().root
+    target = None
     # origin_pos = ListProperty()
     # animated_pos = ListProperty()
     # size_bigger = NumericProperty(300)
@@ -47,9 +51,11 @@ class CircleButton(ButtonBehavior, Widget):
 
     def __init__(self, **kwargs):
         super(CircleButton, self).__init__(**kwargs)
+        self.app = App.get_running_app()
         self.origin_pos = self.pos
         self.animated_pos = self.origin_pos
         self.is_animating = False
+
 
         self.preproc_label = Label(size_hint=(None, None),
                                   width=326, height=170,
@@ -76,6 +82,15 @@ class CircleButton(ButtonBehavior, Widget):
                                    font_size='18sp',
                                    text_size=(326, 170),
                                    valign='top')
+
+        # button_pos_tl = (279, Window.height-270)
+        # button_pos_tr = ()
+        # self.button_more = More_Button()
+
+        # mehr-button positionen: tr = 1847, 277 (w: 71.77 h: 20)
+        # bl: 309, 1010
+        # br: 1847, 1010,
+        # tl: 279, 270 (290)
         # self.preproc_text = Label(size_hint=(None, None), width=326, height=170, x=25, y=100)
 
     def on_touch_down(self, touch):
@@ -83,23 +98,53 @@ class CircleButton(ButtonBehavior, Widget):
             print("Touched!!!")
             print("CircleButton {} touched at {}".format(self.name, touch.pos))
             self.trigger_action()
+        elif self.button_more:
+            print("Button!!! {}".format(self.button_more.pos))
+            if self.button_more.collide_point(*touch.pos):
+                print("Button Touched!!!")
+                self.button_more.trigger_action()
 
-        else:
-            return super(CircleButton, self).on_touch_down(touch)
+        return super(CircleButton, self).on_touch_down(touch)
+
+    def open_hogScreen(self, touch):
+        self.app.manager.current = 'hogScreen'
+
+    def open_camScreen(self, touch):
+        self.app.manager.current = 'camScreen'
+
+    def open_edgedetScreen(self, touch):
+        self.app.manager.current = 'edgeScreen'
+
+    def open_preprocScreen(self, touch):
+        self.app.manager.current = 'preprocScreen'
 
     def toggle_button(self, anim, widget):
         self.is_animating = not self.is_animating
         if not self.is_animating and not self.make_bigger:
             self.ids.circle_title.font_size = '24sp'
+
             if self.name == 'tl':
+                self.button_more= More_Button(x=279, top=Window.height-270)
+                self.target = self.open_preprocScreen
                 self.add_widget(self.preproc_label)
             elif self.name == 'br':
+                self.button_more = More_Button(right=Window.width-279, y=270)
+                self.target = self.open_hogScreen
                 self.add_widget(self.facedet_label)
             elif self.name == 'tr':
+                self.button_more = More_Button(right=Window.width-279, top=Window.height-270)
                 self.add_widget(self.edgedet_label)
+                self.target = self.open_edgedetScreen
+            elif self.name =='bl':
+                self.button_more = More_Button(x=279, y=270)
+                self.target = self.open_camScreen
+            self.add_widget(self.button_more)
+            self.button_more.bind(on_press=self.target)
+
 
         elif self.is_animating and self.make_bigger:
             self.ids.circle_title.font_size = '18sp'
+            self.remove_widget(self.button_more)
             if self.name == 'tl':
                 self.remove_widget(self.preproc_label)
             elif self.name == 'br':

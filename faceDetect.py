@@ -60,7 +60,7 @@ class KivyCamera(Image):
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
         # self.start()
-    
+
 
     def start(self):
         # self.videostream = capture
@@ -83,11 +83,16 @@ class KivyCamera(Image):
         self.last_sec = self.sec
         self.wait_sec = 5
         self.random_s = random.randint(1, 10)
+        self.touint8 = True
 
-        self.cam_screens = [self.original, self.original, self.sobel_cam,
-                            self.sobel_cam, self.angle_cam, self.angle_cam,
-                            self.mag_cam, self.mag_cam, self.hog_cam,
-                            self.hog_cam, self.detect_faces, self.detect_faces]
+        # self.cam_screens = [self.original, self.original, self.sobel_cam,
+        #                     self.sobel_cam, self.angle_cam, self.angle_cam,
+        #                     self.mag_cam, self.mag_cam, self.hog_cam,
+        #                     self.hog_cam, self.detect_faces, self.detect_faces]
+        self.cam_screens = [self.original, self.sobel_cam,
+                            self.angle_cam,
+                            self.mag_cam, self.hog_cam,
+                            self.detect_faces]
         self.screen_iter = iter(self.cam_screens)
         self.display_func = self.original
 
@@ -241,14 +246,15 @@ class KivyCamera(Image):
         self.sec = time.time()
         if (self.sec - self.last_sec) >= self.wait_sec:
             self.last_sec = self.sec
+            # self.touint8 = not self.touint8
             try:
                 self.display_func = next(self.screen_iter)
             except StopIteration:
                 self.screen_iter = iter(self.cam_screens)
                 # self.display_func = self.original
 
-        touint8 = True if self.wait_sec > 2 else False
-        output_img = self.display_func(frame, gray, uint8=touint8)
+        # touint8 = True if self.wait_sec > 2 else False
+        output_img = self.display_func(frame, gray, uint8=self.touint8)
         # print("shape morphed frame {}".format(morphed_frame.shape))
         # print("shape frame {}".format(frame.shape))
 
@@ -324,13 +330,14 @@ class CameraScreen(Widget):
         self.add_widget(self.cam)
         # self.circle = Rings()
         # self.add_widget(self.circle)
-        self.label = Label(pos=(Window.width/2, Window.height/2), color=[.4, .4, .4])
+        self.label = Label(pos=(100, 100), color=[.4, .4, .4])
         self.label.text = self.cam.active_function
         self.add_widget(self.label)
 
 
     def update(self, dt):
-        # print(self.cam.active_function)
+        # print(self.cam.active_function)ß
+        self.label.text = self.cam.active_function
         if self.is_running:
             self.cam.update(dt)
             # if self.cam.widths:

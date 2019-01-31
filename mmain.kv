@@ -1,6 +1,9 @@
 #:import win kivy.core.window.Window
 #:import clock kivy.clock.Clock
 
+<More_Button>:
+    source: 'images/button-mehr.png'
+    # size: self.texture_size
 
 <CircleButton>:
     id: circles
@@ -28,6 +31,9 @@
             20 + self.width/2 if (circles.x < 0) else   win.width - 20 - self.width/2
         y:
             20 if (circles.y < 0) else  win.height- 40
+
+
+
         # pos:
     # Popup:
     #     id: popup
@@ -44,8 +50,8 @@
         on_press: self.color=[0.4, .4, .4]
         on_release:
             self.color=[0.2392, 1., 1.]
-            if self.make_bigger: pass
-            else: app.manager.current = 'hogScreen'
+            # if self.make_bigger: pass
+            # else: app.manager.current = 'hogScreen'
             print("changing to edgeScreen")
             self.toggle_button_behavior()
     CircleButton:
@@ -57,8 +63,8 @@
         on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
             self.color=[0.502, 0.2588, 0.9569]
-            if self.make_bigger: pass
-            else: app.manager.current = "camScreen"
+            # if self.make_bigger: pass
+            # else: app.manager.current = "camScreen"
             self.toggle_button_behavior()
     CircleButton:
         id: top_left
@@ -71,8 +77,8 @@
             print("clicked preprocScreen")
         on_release:
             self.color=[0.2588, 0.502, 0.9569]
-            if self.make_bigger: pass
-            else: app.manager.current = 'preprocScreen'
+            # if self.make_bigger: pass
+            # else: app.manager.current = 'preprocScreen'
             self.toggle_button_behavior()
     CircleButton:
         id: top_right
@@ -83,8 +89,8 @@
         on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
             self.color=[ 0.2588, 0.3725, 0.9569]
-            if self.make_bigger: pass
-            else: app.manager.current = 'edgeScreen'
+            # if self.make_bigger: pass
+            # else: app.manager.current = 'edgeScreen'
             self.toggle_button_behavior()
             print("changing to preprocScreen")
 
