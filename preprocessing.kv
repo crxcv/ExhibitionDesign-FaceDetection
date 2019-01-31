@@ -16,8 +16,9 @@
 <RoundImage>:
     texture: None
     size: root.target_w, root.target_h
+    index:10
 
-    canvas:
+    canvas.before:
         StencilPush
         Ellipse:
             pos: self.pos
@@ -32,39 +33,44 @@
         StencilPop
 
 <Preproc_Anim>:
-    Button:
-        id: btn
-        size_hint: None, None
-        center: win.width/2, win.height/4
-        size: 100, 50
-        on_state: print("pressed")
-        # on_touch_down:
-        #     print("pressed")
-        on_press:
-            modal.open()
-            print("button pressed")
-        text: "popup"
+    # Button:
+    #     id: btn
+    #     size_hint: None, None
+    #     center: win.width/2, win.height/4
+    #     size: 100, 50
+    #     on_state: print("pressed")
+    #     # on_touch_down:
+    #     #     print("pressed")
+    #     on_press:
+    #         modal.open()
+    #         print("button pressed")
+    #     text: "popup"
     RoundImage:
+        index:11
         id: blur
         pos: x1*3- img_h/2, y1
         size: root.target_w, root.target_h
         texture: root.create_texture('blur', make_grey=True)
     RoundImage:
+        index:12
         id: grey2alpha
         pos: x1*2- img_h/2, y1
         size: root.target_w, root.target_h
         texture: root.create_texture('grey', make_grey=True)
     RoundImage:
+        index:13
         id: grey
         pos: x1*2- img_h/2, y1
         size: root.target_w, root.target_h
         texture: root.create_texture('grey', make_grey=True)
     RoundImage:
+        index:14
         id: orig2alpha
         pos: x1- img_h/2, y1
         size: root.target_w, root.target_h
         texture: root.create_texture('orig', is_colored=True)
     RoundImage:
+        index:15
         id: original
         pos: x1- img_h/2, y1
         size: root.target_w, root.target_h
