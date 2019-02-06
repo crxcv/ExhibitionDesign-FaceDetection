@@ -114,6 +114,8 @@ class Hog_Anim(Widget):
     rect_x = NumericProperty(0)
     rect_y = NumericProperty(img_size[1] - face1_width)
 
+    hog_rect =
+
     def __init__(self, **kwargs):
         # self.texture_mini.add_reload_observer(self.populate_texture)
         super(Hog_Anim, self).__init__(**kwargs)

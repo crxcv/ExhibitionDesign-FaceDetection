@@ -41,16 +41,6 @@ from skimage import img_as_float, img_as_int, img_as_uint, img_as_ubyte
 Builder.load_file('edge_detect_ani.kv')
 
 
-class RoundImage(Widget):
-    texture = ObjectProperty(None)
-    h = 350  #ObjectProperty(350)
-    w = int(778 * (h/583))
-    target_w = NumericProperty(w)
-    target_h = NumericProperty(h)
-    x1 = Window.width/4  - h/2
-    y1 = Window.height/3 * 2  - h/2
-    img_x = x1 - ((w - h)/2 )
-    print("win size: {}".format((Window.width, Window.height)))
 
 class Picture(Scatter):
     texture = ObjectProperty(None)

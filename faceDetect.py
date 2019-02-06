@@ -9,6 +9,7 @@ if __name__ == '__main__':
 
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.metrics import *
 
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
@@ -21,6 +22,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from skimage.draw import circle
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 import cv2
 import dlib
@@ -39,12 +41,14 @@ import time
 import random
 from queue import Queue
 from threading import Thread
+from skimage.draw import circle
+from matplotlib import pyplot as plt
+
 
 Builder.load_file('faceDetect.kv')
 
 
-
-class KivyCamera(Image):
+class KivyCamera(FloatLayout):
     circle_pos = ListProperty([0, 0])
     # circle_y = NumericProperty(0)
     circle_r = NumericProperty(0)
@@ -57,8 +61,11 @@ class KivyCamera(Image):
     widths = ListProperty()
     active_function = StringProperty()
 
+
+
     def __init__(self,  **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
+
         # self.start()
 
 
@@ -76,7 +83,7 @@ class KivyCamera(Image):
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         # self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-        # frame = self.videostream.read()
+        frame = self.videostream.read()
         # print("frame size; {}".format(frame.shape))
 
         self.sec = time.time()
@@ -95,6 +102,38 @@ class KivyCamera(Image):
                             self.detect_faces]
         self.screen_iter = iter(self.cam_screens)
         self.display_func = self.original
+
+        dpi = inch(1)
+        self.h_inch = int(frame.shape[0]/dpi)
+        self.w_inch = int(frame.shape[1]/dpi)
+
+        plt.rcParams['savefig.pad_inches'] = 0
+        plt.style.use(['dark_background'])
+        self.fig = plt.figure()  # figsize=(self.h_inch, h_inch)
+
+        # Then we set up our axes (the plot region, or the area in which we plot things).
+        # Usually there is a thin border drawn around the axes, but we turn it off with `frameon=False`.
+        self.ax = plt.axes([0,0,1,1], frameon=False)
+        # Then we disable our xaxis and yaxis completely. If we just say plt.axis('off'),
+        # they are still used in the computation of the image padding.
+        self.ax.get_xaxis().set_visible(False)
+        self.ax.get_yaxis().set_visible(False)
+
+        # Even though our axes (plot region) are set to cover the whole image with [0,0,1,1],
+        # by default they leave padding between the plotted data and the frame. We use tigher=True
+        # to make sure the data gets scaled to the full extents of the axes.
+        plt.autoscale(tight=True)
+        self.ax.imshow(frame, 'brg')
+
+        self.picture  = FigureCanvasKivyAgg(figure=self.fig, size_hint=(None, None))
+        self.picture.size = (frame.shape[1], frame.shape[0])
+        self.picture.center_x = Window.width/2
+        self.picture.center_y = Window.height/2
+
+        self.layout = FloatLayout(size_hint=(None, None))
+
+        self.layout.add_widget(self.picture)
+        self.add_widget(self.layout)
 
     def morphology_transform(self, img, morph_operator=2, element=1, ksize=18):
         morph_op_dic = {0: cv2.MORPH_OPEN,
@@ -118,14 +157,6 @@ class KivyCamera(Image):
 
         return dst
 
-    def original(self, frame, gray, uint8=True):
-        self.active_function = "No Faces"
-        self.wait_sec = 5
-        if not uint8:
-            frame = self.convert2uint32(frame)
-            self.wait_sec = 1
-        return frame
-
     def convert2uint8(self, frame, absolute=True):
         if absolute:
             frame = np.absolute(frame)
@@ -134,22 +165,38 @@ class KivyCamera(Image):
     def convert2uint32(self, frame, absolute=True):
         return np.uint32(frame)
 
+    def plot_frame(self, frame, col_fmt='gray'):
+
+
+
+        return fig
+
+    def original(self, frame, gray, uint8=True):
+        self.active_function = "No Faces"
+        self.wait_sec = 5
+
+
+        # if not uint8:
+        #     frame = self.convert2uint32(frame)
+        #     self.wait_sec = 1
+        return frame
+
     def sobel_cam(self, frame, gray, uint8=True):
         self.active_function = "Sobel"
         blur = cv2.medianBlur(gray, 11)
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
-        sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
-        if uint8:
-            sx = self.convert2uint8(sobelx)
-            sy = self.convert2uint8(sobely)
-        else:
-            sx = self.convert2uint32(sobelx)
-            sy = self.convert2uint32(sobely)
-        # sobelx = 255 - sobelx
-
-        sx = np.dstack([sx, sx, sx])
-        self.wait_sec = 5 if uint8 else 1
-        return sx
+        # sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
+        # if uint8:
+        #     sx = self.convert2uint8(sobelx)
+        #     sy = self.convert2uint8(sobely)
+        # else:
+        #     sx = self.convert2uint32(sobelx)
+        #     sy = self.convert2uint32(sobely)
+        # # sobelx = 255 - sobelx
+        #
+        # sx = np.dstack([sx, sx, sx])
+        # self.wait_sec = 5 if uint8 else 1
+        return sobelx
 
     def angle_cam(self, frame, gray, uint8=True):
         self.active_function = "Angle"
@@ -157,13 +204,13 @@ class KivyCamera(Image):
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
         angle = np.arctan2(sobely, sobelx) * (180 / np.pi)
-        # angle = np.absolute(angle)
-        if uint8:
-            angle = self.convert2uint8(angle, absolute=False)
-        else:
-            angle = self.convert2uint32(angle)
-        angle = np.dstack([angle, angle, angle])
-        self.wait_sec = 5 if uint8 else 1
+        # # angle = np.absolute(angle)
+        # if uint8:
+        #     angle = self.convert2uint8(angle, absolute=False)
+        # else:
+        #     angle = self.convert2uint32(angle)
+        # angle = np.dstack([angle, angle, angle])
+        # self.wait_sec = 5 if uint8 else 1
         return angle
 
     def mag_cam(self, frame, gray, uint8=True):
@@ -172,15 +219,15 @@ class KivyCamera(Image):
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
         mag = np.sqrt(sobelx**2.0 + sobely**2.0)
-        if uint8:
-            mag = self.convert2uint8(mag)
-        else:
-            mag = self.convert2uint32(mag)
-
-        # mag = np.absolute(mag)
-        # mag = np.uint8(mag)
-        mag = np.dstack([mag, mag, mag])
-        self.wait_sec = 5 if uint8 else 1
+        # if uint8:
+        #     mag = self.convert2uint8(mag)
+        # else:
+        #     mag = self.convert2uint32(mag)
+        #
+        # # mag = np.absolute(mag)
+        # # mag = np.uint8(mag)
+        # mag = np.dstack([mag, mag, mag])
+        # self.wait_sec = 5 if uint8 else 1
         return mag
 
     def hog_cam(self, frame, gray, uint8=True):
@@ -193,13 +240,13 @@ class KivyCamera(Image):
                                     visualize=True)
 
         hogImage = exposure.rescale_intensity(hogImage, out_range=(0, 255))
-        if uint8:
-            hogImage = hogImage.astype('uint8')
-            self.wait_sec = 5
-        else:
-            hogImage = hogImage.astype('uint32')
-            self.wait_sec = 1
-        hogImage = np.dstack([hogImage, hogImage, hogImage])
+        # if uint8:
+        #     hogImage = hogImage.astype('uint8')
+        #     self.wait_sec = 5
+        # else:
+        #     hogImage = hogImage.astype('uint32')
+        #     self.wait_sec = 1
+        # hogImage = np.dstack([hogImage, hogImage, hogImage])
 
         return hogImage
 
@@ -232,14 +279,15 @@ class KivyCamera(Image):
             self.circle_c.append([c0, c1])
             # frame = face_utils.visualize_facial_landmarks(morphed_frame,shape)
             self.wait_sec = 5
-            if not uint8:
-                filtered_frame = self.convert2uint32(filtered_frame)
-                self.wait_sec = 1
+            # if not uint8:
+            #     filtered_frame = self.convert2uint32(filtered_frame)
+            #     self.wait_sec = 1
 
         return filtered_frame
 
     def update(self, dt):
         frame = self.videostream.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # add time value to return statements to change the time images are displayed
@@ -254,7 +302,15 @@ class KivyCamera(Image):
                 # self.display_func = self.original
 
         # touint8 = True if self.wait_sec > 2 else False
-        output_img = self.display_func(frame, gray, uint8=self.touint8)
+        # self.remove_widget(self.picture)
+        new_pic = self.display_func(frame, gray, uint8=self.touint8)
+        new_pic = cv2.flip(new_pic, 1)
+        col_fmt = None if (len(new_pic.shape)>2) else 'gray'
+        self.ax.imshow(new_pic, col_fmt)
+        self.picture.draw()
+        # self.picture = FigureCanvasKivyAgg(figure=new_pic, size_hint=(None, None))
+        self.layout._trigger_layout()
+        self._trigger_layout()
         # print("shape morphed frame {}".format(morphed_frame.shape))
         # print("shape frame {}".format(frame.shape))
 
@@ -265,16 +321,16 @@ class KivyCamera(Image):
         self.circle_c = []
 
         # convert to texture
-        buf1 = cv2.flip(output_img, -1)
-        buf = buf1.tostring()
-
-        image_texture = Texture.create(
-                        size=(frame.shape[1], frame.shape[0]),
-                        colorfmt='bgr')
-        image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-
-        # display img
-        self.texture = image_texture
+        # buf1 = cv2.flip(output_img, -1)
+        # buf = buf1.tostring()
+        #
+        # image_texture = Texture.create(
+        #                 size=(frame.shape[1], frame.shape[0]),
+        #                 colorfmt='bgr')
+        # image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+        #
+        # # display img
+        # self.texture = image_texture
 
         # self.fps.update()
         # self.f += 1
