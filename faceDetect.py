@@ -96,7 +96,8 @@ class KivyCamera(FloatLayout):
         #                     self.sobel_cam, self.angle_cam, self.angle_cam,
         #                     self.mag_cam, self.mag_cam, self.hog_cam,
         #                     self.hog_cam, self.detect_faces, self.detect_faces]
-        self.cam_screens = [self.original, self.sobel_cam,
+        self.cam_screens = [self.original, self.sobelx_cam,
+                            self.sobely_cam,
                             self.angle_cam,
                             self.mag_cam, self.hog_cam,
                             self.detect_faces]
@@ -130,8 +131,12 @@ class KivyCamera(FloatLayout):
         self.picture.center_x = Window.width/2
         self.picture.center_y = Window.height/2
 
-        self.layout = FloatLayout(size_hint=(None, None))
+        self.label = Label(text='Gesichtserkennung wird gestartet ... \n', size_hint=(None, None))
+        self.label.x = 100
+        self.label.center_y = Window.height/2
 
+        self.layout = FloatLayout(size_hint=(None, None))
+        self.layout.add_widget(self.label)
         self.layout.add_widget(self.picture)
         self.add_widget(self.layout)
 
@@ -165,38 +170,25 @@ class KivyCamera(FloatLayout):
     def convert2uint32(self, frame, absolute=True):
         return np.uint32(frame)
 
-    def plot_frame(self, frame, col_fmt='gray'):
-
-
-
-        return fig
-
     def original(self, frame, gray, uint8=True):
         self.active_function = "No Faces"
         self.wait_sec = 5
 
-
-        # if not uint8:
-        #     frame = self.convert2uint32(frame)
-        #     self.wait_sec = 1
         return frame
 
-    def sobel_cam(self, frame, gray, uint8=True):
-        self.active_function = "Sobel"
+    def sobelx_cam(self, frame, gray, uint8=True):
+        self.active_function = "Sobelx"
         blur = cv2.medianBlur(gray, 11)
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
-        # sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
-        # if uint8:
-        #     sx = self.convert2uint8(sobelx)
-        #     sy = self.convert2uint8(sobely)
-        # else:
-        #     sx = self.convert2uint32(sobelx)
-        #     sy = self.convert2uint32(sobely)
-        # # sobelx = 255 - sobelx
-        #
-        # sx = np.dstack([sx, sx, sx])
-        # self.wait_sec = 5 if uint8 else 1
+
         return sobelx
+
+    def sobely_cam(self, frame, gray, uint8=True):
+        self.active_function = "Sobely"
+        blur = cv2.medianBlur(gray, 11)
+        sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
+
+        return sobely
 
     def angle_cam(self, frame, gray, uint8=True):
         self.active_function = "Angle"
@@ -204,13 +196,7 @@ class KivyCamera(FloatLayout):
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
         angle = np.arctan2(sobely, sobelx) * (180 / np.pi)
-        # # angle = np.absolute(angle)
-        # if uint8:
-        #     angle = self.convert2uint8(angle, absolute=False)
-        # else:
-        #     angle = self.convert2uint32(angle)
-        # angle = np.dstack([angle, angle, angle])
-        # self.wait_sec = 5 if uint8 else 1
+
         return angle
 
     def mag_cam(self, frame, gray, uint8=True):
@@ -219,15 +205,7 @@ class KivyCamera(FloatLayout):
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
         mag = np.sqrt(sobelx**2.0 + sobely**2.0)
-        # if uint8:
-        #     mag = self.convert2uint8(mag)
-        # else:
-        #     mag = self.convert2uint32(mag)
-        #
-        # # mag = np.absolute(mag)
-        # # mag = np.uint8(mag)
-        # mag = np.dstack([mag, mag, mag])
-        # self.wait_sec = 5 if uint8 else 1
+
         return mag
 
     def hog_cam(self, frame, gray, uint8=True):
@@ -240,13 +218,6 @@ class KivyCamera(FloatLayout):
                                     visualize=True)
 
         hogImage = exposure.rescale_intensity(hogImage, out_range=(0, 255))
-        # if uint8:
-        #     hogImage = hogImage.astype('uint8')
-        #     self.wait_sec = 5
-        # else:
-        #     hogImage = hogImage.astype('uint32')
-        #     self.wait_sec = 1
-        # hogImage = np.dstack([hogImage, hogImage, hogImage])
 
         return hogImage
 
@@ -277,11 +248,6 @@ class KivyCamera(FloatLayout):
             c0 = self.coords_left[i] + (int(face.width()/2))
             c1 = self.coords_bottom[i] + (int(face.width()/2))
             self.circle_c.append([c0, c1])
-            # frame = face_utils.visualize_facial_landmarks(morphed_frame,shape)
-            self.wait_sec = 5
-            # if not uint8:
-            #     filtered_frame = self.convert2uint32(filtered_frame)
-            #     self.wait_sec = 1
 
         return filtered_frame
 
@@ -290,6 +256,7 @@ class KivyCamera(FloatLayout):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+        self.label.texture_update()
         # add time value to return statements to change the time images are displayed
         self.sec = time.time()
         if (self.sec - self.last_sec) >= self.wait_sec:
@@ -299,6 +266,29 @@ class KivyCamera(FloatLayout):
                 self.display_func = next(self.screen_iter)
             except StopIteration:
                 self.screen_iter = iter(self.cam_screens)
+                self.label.text = 'Gesichtserkennung wird gestartet ... \n'
+            if self.display_func == self.sobelx_cam:
+                print('1')
+                self.label.text += 'Suche Kanten ... \n'
+                self.label.text += 'in x-Richtung ... \n'
+            elif self.display_func == self.sobely_cam:
+                self.label.text += 'erledigt. \n'
+                self.label.text += 'in y-Richtung ... \n'
+            elif self.display_func == self.angle_cam:
+                self.label.text += 'erledigt. \n'
+                self.label.text += 'Berechne Stärke ... \n'
+            elif self.display_func == self.mag_cam:
+                self.label.text += 'erledigt. \n'
+                self.label.text += 'Berechne Richtung ... \n'
+            elif self.display_func == self.hog_cam:
+                self.label.text += 'erledigt. \n'
+                self.label.text += 'Finde Gesichter ... \n'
+            elif self.display_func == self.detect_faces:
+                self.label.text += 'erledigt. \n\n'
+            self.label.texture_update()
+
+
+
                 # self.display_func = self.original
 
         # touint8 = True if self.wait_sec > 2 else False
@@ -308,32 +298,14 @@ class KivyCamera(FloatLayout):
         col_fmt = None if (len(new_pic.shape)>2) else 'gray'
         self.ax.imshow(new_pic, col_fmt)
         self.picture.draw()
-        # self.picture = FigureCanvasKivyAgg(figure=new_pic, size_hint=(None, None))
         self.layout._trigger_layout()
-        self._trigger_layout()
-        # print("shape morphed frame {}".format(morphed_frame.shape))
-        # print("shape frame {}".format(frame.shape))
 
-        #  (1024, 1280, 3) 583, 778  1.756, 1.645   0.52539, 0,6078125
         self.coords_left = []
         self.coords_bottom = []
         self.widths = []
         self.circle_c = []
 
-        # convert to texture
-        # buf1 = cv2.flip(output_img, -1)
-        # buf = buf1.tostring()
-        #
-        # image_texture = Texture.create(
-        #                 size=(frame.shape[1], frame.shape[0]),
-        #                 colorfmt='bgr')
-        # image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        #
-        # # display img
-        # self.texture = image_texture
 
-        # self.fps.update()
-        # self.f += 1
     def stop(self):
         print("stopping video capture")
         self.videostream.stop()
