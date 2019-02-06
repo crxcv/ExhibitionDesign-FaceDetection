@@ -11,11 +11,12 @@ from kivy.base import runTouchApp
 from kivy.clock import Clock
 
 from kivy.graphics import *
+from kivy.metrics import *
 
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
-# from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.floatlayout import FloatLayout
 # from kivy.uix.stencilview import StencilView
 from kivy.uix.modalview import ModalView
 import kivy.graphics.stencil_instructions
@@ -25,11 +26,14 @@ from kivy.animation import Animation
 
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, ListProperty, NumericProperty, StringProperty
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 import cv2
 import imutils
 import numpy as np
 from skimage.transform import pyramid_gaussian
+from skimage.draw import circle
+from matplotlib import pyplot as plt
 
 
 Builder.load_file('preprocessing.kv')
@@ -38,22 +42,15 @@ Builder.load_file('preprocessing.kv')
 class Root(Widget):
     pass
 
-class RoundImage(Widget):
-    texture = ObjectProperty(None)
-    h = 350  #ObjectProperty(350)
-    w = int(778 * (h/583))
-    target_w = NumericProperty(w)
-    target_h = NumericProperty(h)
-    x1 = Window.width/4  - h/2
-    y1 = Window.height/3 * 2  - h/2
-    img_x = x1 - ((w - h)/2 )
+
 
 
 class Preproc_Anim(Widget):
 
     img = ObjectProperty()
     img = cv2.imread('images/orig.JPEG')
-    img = cv2.flip(img, 0)
+    # img = cv2.flip(img, 0)
+
     h = 350  #ObjectProperty(350)
     w = int(img.shape[1] * (h/img.shape[0]))
     target_w = ObjectProperty(w)
@@ -67,10 +64,60 @@ class Preproc_Anim(Widget):
     img = cv2.resize(img, (w, h), cv2.INTER_AREA)
     print("ing size: {}".format(img.shape))
 
+    # convert size to inch for figuresize (pyplot)
+    dpi = inch(1)
+    h_inch = int(h/dpi)
+
+    # cut out square
+    dist = int((img.shape[1] - h) / 2)
+    img = img[:, dist:dist+h]
+
+    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(grey, (7, 7), 0)
+
+    orig_ov = np.zeros(img.shape)
+    grey_ov = np.zeros(grey.shape)
+    blur_ov = np.zeros(blur.shape)
+
+
     pos_y = ObjectProperty(Window.height/2 + 100)
     orig_size = ListProperty((img.shape[0], img.shape[1]))
     img_pyr = []
     im_in_pyr = 0
+
+    # pixel coords round part in big img
+    mid_x = int(img.shape[0]/2)
+    mid_y = int(img.shape[1]/2)
+    rr, cc = circle(mid_x, mid_y, mid_y, (350, 350))
+
+    orig_ov[rr, cc] = img[rr, cc]
+    grey_ov[rr, cc] = grey[rr, cc]
+    blur_ov[rr, cc] = blur[rr, cc]
+
+    plt.rcParams['savefig.pad_inches'] = 0
+    plt.style.use(['dark_background'])
+
+    orig_fig = plt.figure(figsize=(h_inch, h_inch))
+    ax_o = plt.axes([0,0,1,1], frameon=False)
+    ax_o.get_xaxis().set_visible(False)
+    ax_o.get_yaxis().set_visible(False)
+    plt.autoscale(tight=True)
+    plt.imshow(orig_ov, 'brg')
+
+    grey_fig = plt.figure(figsize=(h_inch, h_inch))
+    ax_grey = plt.axes([0,0,1,1], frameon=False)
+    ax_grey.get_xaxis().set_visible(False)
+    ax_grey.get_yaxis().set_visible(False)
+    plt.autoscale(tight=True)
+    plt.imshow(grey_ov, 'gray')
+
+
+    blur_fig = plt.figure(figsize=(h_inch, h_inch))
+    ax_blur = plt.axes([0,0,1,1], frameon=False)
+    ax_blur.get_xaxis().set_visible(False)
+    ax_blur.get_yaxis().set_visible(False)
+    plt.autoscale(tight=True)
+    plt.imshow(blur_ov, 'gray')
 
     text_orig = "Wir Menschen erkennen Objekte oder auch Muster meist auf den ersaten Blick. "
     text_orig += "Computer hingegen müssen zuerst das ganze Bild, also jeden einzelnen Pixel "
@@ -86,20 +133,34 @@ class Preproc_Anim(Widget):
     text_blur += "dass zusammenhängende Flächen besser zu erkennen sind"
     text_blur = StringProperty(text_blur)
 
+    def __init__(self, **kwargs):
+        super(Preproc_Anim, self).__init__(**kwargs)
 
-    # def __init__(self, **kwargs):
-    #     super(Preproc_Anim, self).__init__(**kwargs)
-        # self.start()
-        # self.img = cv2.imread('images/orig.JPEG')
-        # self.img = cv2.flip(self.img, 0)
+        y_img = Window.height - 106
+        cx1 = 417
+        cx2 = Window.width/2
+        cx3 = Window.width - cx1
 
-    # def on_touch_down(self, touch):
-    #     print("Preproc) touched at {}".format(touch.pos))
-    #     # print(self.ids)
-    #     if self.ids.btn.collide_point(*touch.pos):
-    #         print("touched button")
-    #         self.ids.btn.trigger_action()
-    #     return super(Preproc_Anim, self).on_touch_down(touch)
+        layout = FloatLayout(size_hint=(None, None))
+        orig = FigureCanvasKivyAgg(figure=self.orig_fig, size_hint=(None, None))
+        orig.size = (self.w, self.h)
+        orig.top = y_img
+        orig.centrer_x = cx1
+        layout.add_widget(orig)
+
+        grey = FigureCanvasKivyAgg(figure=self.grey_fig, size_hint=(None, None))
+        grey.size = (self.w, self.h)
+        grey.top = y_img
+        grey.center_x = cx2
+        layout.add_widget(grey)
+
+        blur = FigureCanvasKivyAgg(figure=self.grey_fig, size_hint=(None, None))
+        blur.size = (self.w, self.h)
+        blur.top = y_img
+        blur.center_x = cx3
+        layout.add_widget(blur)
+
+        self.add_widget(layout)
 
     def create_texture(self, img_name=None, image=None, is_colored=False, make_grey=False):
         if image is None:

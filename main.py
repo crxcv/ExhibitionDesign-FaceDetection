@@ -20,7 +20,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 
 # local libraries
-from edge_detect_ani import EdgeDetect
+from edge_detect import EdgeDetect
 from preprocessing_ani import Preproc_Anim
 from faceDetect import CameraScreen
 from hog_detect import Hog_Detect

@@ -19,7 +19,6 @@
 
 
 
-
 <Root>:
     Preproc_Anim
 
@@ -45,39 +44,7 @@
 
 <EdgeDetect>:
 
-    # RoundImage:
-    #     id: blur
-    #     # pos: 10, 10
-    #     center_x: 60
-    #     center_y: win_height/2
-    #     size: root.orig_size  # [1], root.orig_size[0]
-    #     texture: root.create_texture('blur')
-    RoundImage:
-        id: sobel_x
-        # pos: root.pos_x, root.pos_y
-        # pos: root.pos_x, root.pos_y
-        size: root.orig_size
-        center_x: ecx1
-        center_y: ecy1  # [1], root.orig_size[0]
-        texture: root.create_texture('sobel_y')
-    RoundImage:
-        id: sobel_y
-        center: ecx1, ecy2
-        # pos: root.pos_x, 10
-        size: root.orig_size  # [1], root.orig_size[0]
-        texture: root.create_texture('sobel_y')
-    RoundImage:
-        id: mag
-        center: ecx2, ecy2
-        # pos: root.pos_x*2, 10
-        size: root.orig_size  # [1], root.orig_size[0]
-        texture: root.create_texture('mag')
-    RoundImage:
-        id: angle
-        center: ecx2, ecy1
-        # pos: root.pos_x*2, root.pos_y
-        size: root.orig_size  # [1], root.orig_size[0]
-        texture: root.create_texture('angle')
+
     Label:
         id: header
         font_size: 30
