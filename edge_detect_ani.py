@@ -44,9 +44,9 @@ class RoundImage(Widget):
     w = int(778 * (h/583))
     target_w = NumericProperty(w)
     target_h = NumericProperty(h)
-    x1 = Window.width/4  - h/2
-    y1 = Window.height/3 * 2  - h/2
-    img_x = x1 - ((w - h)/2 )
+    x1 = Window.width/4 - h/2
+    y1 = Window.height/3 * 2 - h/2
+    img_x = x1 - ((w - h)/2)
     print("win size: {}".format((Window.width, Window.height)))
 
 class Picture(Scatter):
@@ -183,8 +183,14 @@ class EdgeDetect(Widget):
     rect_h = ObjectProperty(0)
     rect_w = ObjectProperty(0)
 
-    text_sobel = "Eine Methode zur Kantenerkennung wird mithilfe des"
-    text_sobel += " Sobel-Operators erreicht"
+    text_sobel = StringProperty()
+    text_angleMag = StringProperty()
+    text_sobel = "Aus dem zuvor erstellten Graustufenbild wird nun das sogenannte Gradient Image errechnet. "
+    text_sobel += "Dies beschreibt die Veränderung der Helligkeitswerte an jedem einzelnen Punkt des Bildes, wobei keine oder nur eine geringe Veränderung bedeutet, dass hier eine Fläche vorliegt, wobei eine große Änderung ein Hinweis auf eine Kante darstellt. "
+    text_sobel += "Erreicht wird dies durch einen sogenannten Faltungsalgorithmus"
+
+    text_angleMag = "Anhand des Gradient Images werden nun an jedem Pixel zwei Masse bestimmt: "
+    text_angleMag += "Die Richtung der Größten Helligkeitsaenderung sowie dessen Stärke, wobei das obere Bild die Richtung der Helligkeitsänderung beschreibt, das untere Bild die Bereiche der Größten Änderung."
 
     def get_pos(self):
         return self.rect_pos[0], se

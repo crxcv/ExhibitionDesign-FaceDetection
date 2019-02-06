@@ -87,8 +87,8 @@ class Preproc_Anim(Widget):
     text_blur = StringProperty(text_blur)
 
 
-    def __init__(self, **kwargs):
-        super(Preproc_Anim, self).__init__(**kwargs)
+    # def __init__(self, **kwargs):
+    #     super(Preproc_Anim, self).__init__(**kwargs)
         # self.start()
         # self.img = cv2.imread('images/orig.JPEG')
         # self.img = cv2.flip(self.img, 0)

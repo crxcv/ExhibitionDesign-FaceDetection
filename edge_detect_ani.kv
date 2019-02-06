@@ -7,58 +7,75 @@
 #:set x1 win_width/4
 #:set y1 win_height/3 * 2  - img_h/2
 #:set img_x x1 - ((img_w - img_h)/2 )
+#:set ecx1 722.25
+#:set ecx2 1186.25
+#:set ecy1 win_height - 332.5
+#:set ecy2 win_height - 747.25
+#:set txt_right 150+350
+#:set txt_x1 192
+#:set txt_x2 1374
+#:set txt_y1 win_height-187
+#:set txt_y1 win_height-702
+
+
 
 
 <Root>:
     Preproc_Anim
 
 
-<RoundImage>:
-    texture: None
-    size: root.target_w, root.target_h
-
-    canvas:
-        StencilPush
-        Ellipse:
-            pos: self.pos
-            size: self.height, self.height
-        StencilUse
-        Rectangle:
-            id: original
-            texture: self.texture
-            pos: self.x - ((root.target_w - root.target_h)/2),  self.y
-            size: self.width, self.height
-        StencilUnUse
-        StencilPop
+# <RoundImage>:
+#     texture: None
+#     size: root.target_w, root.target_h
+#
+#     canvas:
+#         StencilPush
+#         Ellipse:
+#             pos: self.pos
+#             size: self.height, self.height
+#         StencilUse
+#         Rectangle:
+#             id: original
+#             texture: self.texture
+#             pos: self.x - ((root.target_w - root.target_h)/2),  self.y
+#             size: self.width, self.height
+#         StencilUnUse
+#         StencilPop
 
 
 <EdgeDetect>:
 
-    RoundImage:
-        id: blur
-        # pos: 10, 10
-        center_x: 60
-        center_y: win_height/2
-        size: root.orig_size  # [1], root.orig_size[0]
-        texture: root.create_texture('blur')
+    # RoundImage:
+    #     id: blur
+    #     # pos: 10, 10
+    #     center_x: 60
+    #     center_y: win_height/2
+    #     size: root.orig_size  # [1], root.orig_size[0]
+    #     texture: root.create_texture('blur')
     RoundImage:
         id: sobel_x
-        pos: root.pos_x, root.pos_y
-        size: root.orig_size  # [1], root.orig_size[0]
+        # pos: root.pos_x, root.pos_y
+        # pos: root.pos_x, root.pos_y
+        size: root.orig_size
+        center_x: ecx1
+        center_y: ecy1  # [1], root.orig_size[0]
         texture: root.create_texture('sobel_y')
     RoundImage:
         id: sobel_y
-        pos: root.pos_x, 10
+        center: ecx1, ecy2
+        # pos: root.pos_x, 10
         size: root.orig_size  # [1], root.orig_size[0]
         texture: root.create_texture('sobel_y')
     RoundImage:
         id: mag
-        pos: root.pos_x*2, 10
+        center: ecx2, ecy2
+        # pos: root.pos_x*2, 10
         size: root.orig_size  # [1], root.orig_size[0]
         texture: root.create_texture('mag')
     RoundImage:
         id: angle
-        pos: root.pos_x*2, root.pos_y
+        center: ecx2, ecy1
+        # pos: root.pos_x*2, root.pos_y
         size: root.orig_size  # [1], root.orig_size[0]
         texture: root.create_texture('angle')
     Label:
@@ -69,7 +86,21 @@
         top: win_height - 20
     Label:
         id: sobel
-        #
+        font_size: '18sp'
+        x: txt_x1
+        # right: txt_right
+        center_y: win_height/2
+        text: root.text_sobel
+        text_size: 350, self.texture_size[1]
+        valign: 'top'
+    Label:
+        id: mag
+        font_size: '18sp'
+        x: txt_x2
+        center_y: win_height/2
+        text: root.text_angleMag
+        text_size: 350, self.texture_size[1]
+        align: 'top'
 #    StencilView:
 #        id: mag-s
 #        pos: root.pos_x*2, 10

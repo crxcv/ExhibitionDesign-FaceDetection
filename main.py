@@ -37,6 +37,11 @@ class CircleButton(ButtonBehavior, Widget):
     color = ListProperty([1., 1., 1.])
     make_bigger = BooleanProperty(True)
     button_more = ObjectProperty()
+    button_more_x = 349
+    button_more_y= 270
+
+    text_label_x = None
+    text_label_y = None
     # app = App.get_running_app().root
     target = None
     # origin_pos = ListProperty()
@@ -45,9 +50,10 @@ class CircleButton(ButtonBehavior, Widget):
     is_animating = BooleanProperty()
     name = StringProperty()
     title = StringProperty()
-    preproc_text = "Bevor der Computer das Bild verarbeiten kann, muss es zuerst vorbereitet werden. "
-    edgedet_text = "Mehrere Schritte sind nötig, um zu analysieren, wo sich auf dem Bild Kanten befinden. Alle diese Schritte sind erforderlich, um anschließend Objekte auf dem Bild zu erkennen."
+    edgedet_text ="Während der Kantendetektion wird versucht, flächige Bereiche auf einem Bild voneinander zu trennen, wenn sie sich ausreichend in Farb- oder Grauwert, Helligkeit oder Textur voneinander unterscheiden."
+    preproc_text = "Bei vielen Aufgaben der Computer Vision ist es hilfreich, die Schärfe des Bildes zu reduzieren (weichzeichnen), das Bild enstprechend skalieren und diese verschiedenen Schärfegrade separat zu analysieren."
     hog_text = "Anhand der zuvor berechneten Bilder wird mithilfe eines Convolutional Neural Networks, einem Tool zur Klassifizierung von Daten, Objekte auf Bildern zu erkennen"
+    cam_text= "Der gesamte Prozess der Gesichtserkennung wird nun anhand Live-Bildern des Ausstellungsraums visualisiert. "
 
     def __init__(self, **kwargs):
         super(CircleButton, self).__init__(**kwargs)
@@ -82,7 +88,14 @@ class CircleButton(ButtonBehavior, Widget):
                                    font_size='18sp',
                                    text_size=(326, 170),
                                    valign='top')
-
+        self.camt_label = Label(size_hint=(None, None),
+                                   width=326, height=170,
+                                   x=23,
+                                   y=100,
+                                   text=self.cam_text,
+                                   font_size='18sp',
+                                   text_size=(326, 170),
+                                   valign='top')
         # button_pos_tl = (279, Window.height-270)
         # button_pos_tr = ()
         # self.button_more = More_Button()
@@ -103,6 +116,9 @@ class CircleButton(ButtonBehavior, Widget):
             if self.button_more.collide_point(*touch.pos):
                 print("Button Touched!!!")
                 self.button_more.trigger_action()
+        elif not self.make_bigger:
+            self.toggle_button_behavior()
+
 
         return super(CircleButton, self).on_touch_down(touch)
 
@@ -124,19 +140,23 @@ class CircleButton(ButtonBehavior, Widget):
             self.ids.circle_title.font_size = '24sp'
 
             if self.name == 'tl':
-                self.button_more= More_Button(x=279, top=Window.height-270)
+                self.button_more= More_Button(right=self.preproc_label.right, top=Window.height-self.button_more_y)
+                # self.button_more= More_Button(x=self.button_more_x, top=Window.height-self.button_more_y)
                 self.target = self.open_preprocScreen
                 self.add_widget(self.preproc_label)
             elif self.name == 'br':
-                self.button_more = More_Button(right=Window.width-279, y=270)
+                self.button_more = More_Button(x=self.facedet_label.x, y=self.button_more_y)
+                # self.button_more = More_Button(right=Window.width-self.button_more_x, y=self.button_more_y)
                 self.target = self.open_hogScreen
                 self.add_widget(self.facedet_label)
             elif self.name == 'tr':
-                self.button_more = More_Button(right=Window.width-279, top=Window.height-270)
+                self.button_more = More_Button(x=self.edgedet_label.x, top=Window.height-self.button_more_y)
+                # self.button_more = More_Button(right=Window.width-self.button_more_x, top=Window.height-self.button_more_y)
                 self.add_widget(self.edgedet_label)
                 self.target = self.open_edgedetScreen
             elif self.name =='bl':
-                self.button_more = More_Button(x=279, y=270)
+                self.button_more = More_Button(right=self.preproc_label.right, y=self.button_more_y)
+                # self.button_more = More_Button(x=self.button_more_x, y=self.button_more_y)
                 self.target = self.open_camScreen
             self.add_widget(self.button_more)
             self.button_more.bind(on_press=self.target)
@@ -224,24 +244,24 @@ class CamScreen(Screen):
     #     return super(CamScreen, self).on_touch_down(touch)
 
 
-# class PreprocScreen(Screen):
-#     preproc = ObjectProperty()
-#     # def on_touch_down(self, touch):
-#     #     print("PreprocScreen(Screen) touched at {}".format(touch.pos))
-#     #     # return super(PreprocScreen, self).on_touch_down(touch)
-#     #     return True
-#     # def build(self):
-#     # def __init__(self, **kwargs):
-#     #     super(PreprocScreen, self).__init__(**kwargs)
-#     #     self.app = App.get_runing_app()
-#     #
-#
-#     def on_enter(self):
-#         print("entering preprocScreen")
-#         # self.preproc.start()
-#
-#     def on_leave(self):
-#         print("leaving preprocScreen")
+class PreprocScreen(Screen):
+    preproc = ObjectProperty()
+    # def on_touch_down(self, touch):
+    #     print("PreprocScreen(Screen) touched at {}".format(touch.pos))
+    #     # return super(PreprocScreen, self).on_touch_down(touch)
+    #     return True
+    # def build(self):
+    # def __init__(self, **kwargs):
+    #     super(PreprocScreen, self).__init__(**kwargs)
+    #     self.app = App.get_runing_app()
+    #
+
+    def on_enter(self):
+        print("entering preprocScreen")
+        # self.preproc.start()
+
+    def on_leave(self):
+        print("leaving preprocScreen")
 
 
 class EdgedetScreen(Screen):
@@ -274,22 +294,28 @@ class HogScreen(Screen):
 class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
         super(ScreenManagement, self).__init__(**kwargs)
-        app = App.get_running_app()
-        preproc = Preproc_Anim()
-        menu = Menu()
-        button = Button(size_hint=(None, None),
-                             center=(Window.width/2, Window.height/4),
-                             text="open popup")
-
-        preproc_screen = Screen(name="preprocScreen")
-        preproc_screen.add_widget(menu, index=0)
-        preproc_screen.add_widget(preproc, index=2)
-        preproc_screen.add_widget(button, index=0)
-        # button.bind(on_press=app.manager.preproc_popup())
-        self.add_widget(preproc_screen)
+        self.add_widget(PreprocScreen(name="preprocScreen"))
         self.add_widget(CamScreen(name="camScreen"))
         self.add_widget(EdgedetScreen(name="edgeScreen"))
         self.add_widget(HogScreen(name="hogScreen"))
+
+    # def build_stuff(self):
+    #     self.app = App.get_running_app()
+    #     preproc = Preproc_Anim()
+    #     menu = Menu()
+    #     button = Button(size_hint=(None, None),
+    #                          center=(Window.width/2, Window.height/4),
+    #                          text="open popup")
+    #
+    #     preproc_screen = Screen(name="preprocScreen")
+    #     preproc_screen.add_widget(menu, index=0)
+    #     preproc_screen.add_widget(preproc, index=2)
+    #     preproc_screen.add_widget(button, index=0)
+    #     button.bind(on_press=self.app.manager.preproc_popup())
+    #     self.add_widget(preproc_screen)
+    #     self.add_widget(CamScreen(name="camScreen"))
+    #     self.add_widget(EdgedetScreen(name="edgeScreen"))
+    #     self.add_widget(HogScreen(name="hogScreen"))
 
     def preproc_popup(self):
         preproc_popup = ModalView(size_hint=(None, 1),
@@ -327,9 +353,7 @@ class MainApp(App):
         # self.manager.add_widget(EdgedetScreen(name="edgeScreen"))
         # self.manager.add_widget(HogScreen(name="hogScreen"))
 
-
         return self.manager
-
 
 
     def edgedetect_popup(ModalView):

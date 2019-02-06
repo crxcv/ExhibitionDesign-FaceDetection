@@ -117,7 +117,7 @@ class ShadowBehavior(object):
         offset_y = shadow_data[0]
         radius = shadow_data[1]
         w, h = ow + radius * 6.0, oh + radius * 6.0
-        t1 = self._create_boxshadow(ow, oh, radius, shadow_data[2])
+        t1 = self._create_circleshadow(ow, oh, radius, shadow_data[2])
         self.shadow_texture1 = t1
         self.shadow_size1 = w, h
         self.shadow_pos1 = self.x - \
@@ -128,13 +128,13 @@ class ShadowBehavior(object):
         offset_y = shadow_data[3]
         radius = shadow_data[4]
         w, h = ow + radius * 6.0, oh + radius * 6.0
-        t2 = self._create_boxshadow(ow, oh, radius, shadow_data[5])
+        t2 = self._create_circleshadow(ow, oh, radius, shadow_data[5])
         self.shadow_texture2 = t2
         self.shadow_size2 = w, h
         self.shadow_pos2 = self.x - \
             (w - ow) / 2. + offset_x, self.y - (h - oh) / 2. - offset_y
 
-    def _create_boxshadow(self, ow, oh, radius, alpha):
+    def _create_circleshadow(self, ow, oh, radius, alpha):
         # We need a bigger texture to correctly blur the edges
         w = ow + radius * 6.0
         h = oh + radius * 6.0

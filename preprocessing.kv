@@ -4,9 +4,17 @@
 
 #:set img_h 350
 #:set img_w 467
-#:set x1 win_width/4
-#:set y1 win_height/3 * 2  - img_h/2
+#:set cx1 417
+#:set cx2 win_width/2
+#:set cx3 win_width-cx1
+#:set x1 242
+#:set x2 785
+#:set x3 win_width-x1
+#:set y_text win_height - 589
+#:set y_img win_height - 106
 #:set img_x x1 - ((img_w - img_h)/2 )
+#:set textwin_width 350
+#:set textwin_height 292
 
 
 <Root>:
@@ -21,12 +29,13 @@
     canvas.before:
         StencilPush
         Ellipse:
-            pos: self.pos
+            pos: self.pos[0] + (root.target_w - root.target_h)/2, self.pos[1]
             size: self.height, self.height
         StencilUse
         Rectangle:
             id: original
             texture: self.texture
+            # pos: self.x,  self.y
             pos: self.x - ((root.target_w - root.target_h)/2),  self.y
             size: self.width, self.height
         StencilUnUse
@@ -46,54 +55,62 @@
     #         print("button pressed")
     #     text: "popup"
     RoundImage:
-        index:11
         id: blur
-        pos: x1*3- img_h/2, y1
+        center_x: cx3
+        top: y_img
         size: root.target_w, root.target_h
         texture: root.create_texture('blur', make_grey=True)
     RoundImage:
-        index:12
         id: grey2alpha
-        pos: x1*2- img_h/2, y1
+        center_x: cx2
+        top: y_img
         size: root.target_w, root.target_h
         texture: root.create_texture('grey', make_grey=True)
     RoundImage:
-        index:13
         id: grey
-        pos: x1*2- img_h/2, y1
+        center_x: cx2
+        top: y_img
         size: root.target_w, root.target_h
         texture: root.create_texture('grey', make_grey=True)
     RoundImage:
-        index:14
         id: orig2alpha
-        pos: x1- img_h/2, y1
+        center_x: cx1
+        top: y_img
         size: root.target_w, root.target_h
         texture: root.create_texture('orig', is_colored=True)
     RoundImage:
-        index:15
         id: original
-        pos: x1- img_h/2, y1
+        center_x: cx1
+        top: y_img
         size: root.target_w, root.target_h
         texture: root.create_texture('orig', is_colored=True)
+
 
     Label:
         id: text_orig
         text: root.text_orig
-        center_x: original.center_x -((root.target_w - root.target_h)/2)
-        top: win.height/2 - img_h/4
-        text_size: original.h, self.size[1]
+        center_x: cx1
+        # center_x: original.center_x -((root.target_w - root.target_h)/2)
+        top: y_text
+        text_size: textwin_width, textwin_height
+        font_size: '18sp'
         valign: "top"
     Label:
         id: text_grey
         text: root.text_grey
-        center_x: grey.center_x -((root.target_w - root.target_h)/2)
-        top: win.height/2 - img_h/4
-        text_size: original.h,  self.size[1]
+        center_x: cx2
+        # center_x: grey.center_x -((root.target_w - root.target_h)/2)
+        top: y_text
+        text_size: textwin_width, textwin_height
+        font_size: '18sp'
         valign: "top"
+
     Label:
         id: text_blur
         text: root.text_blur
-        center_x: blur.center_x -((root.target_w - root.target_h)/2)
-        top: win.height/2 - img_h/4
-        text_size: original.h,  self.size[1]
+        center_x: cx3
+        # center_x: blur.center_x -((root.target_w - root.target_h)/2)
+        top: y_text
+        text_size: textwin_width, textwin_height
+        font_size: '18sp'
         valign: "top"

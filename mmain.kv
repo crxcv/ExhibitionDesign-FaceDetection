@@ -46,7 +46,7 @@
         name: "br"
         title: "Gesichts-\nerkennung"
         color: 0.2392, 1., 1.
-        center: win.width, 0
+        center: win.width-25, 0
         on_press: self.color=[0.4, .4, .4]
         on_release:
             self.color=[0.2392, 1., 1.]
@@ -58,7 +58,7 @@
         id: bottom_left
         name: "bl"
         title: "Camera"
-        center: 0, 0
+        center: 25, 0
         color: 0.502, 0.2588, 0.9569
         on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
@@ -70,7 +70,7 @@
         id: top_left
         name: "tl"
         title: "Bildvorbereitung"
-        center: 0, win.height
+        center: 25, win.height
         color: 0.2588, 0.502, 0.9569
         on_press:
             self.color = [0.4, 0.4, 0.4]
@@ -85,7 +85,7 @@
         name: "tr"
         title: "Kantenerkennung"
         color: 0.2588, 0.3725, 0.9569
-        center:  win.width, win.height
+        center:  win.width-25, win.height
         on_press: self.color = [0.4, 0.4, 0.4]
         on_release:
             self.color=[ 0.2588, 0.3725, 0.9569]
@@ -102,25 +102,25 @@
         id: cam
     Menu:
         id: menu
-# <PreprocScreen>:
-#     FloatLayout:
-#         size_hint: None, None
-#         preproc: preproc
-#         # name: 'preprocScreen'
-#         Preproc_Anim:
-#             size_hint:None, None
-#             id: preproc
-#             index: 2
-#
-#         Button:
-#             size_hint: None, None
-#             center: win.width/2, win.height/4
-#             size: 100, 50
-#             text: "open popup"
-#             on_press: app.manager.preproc_popup()
-#         Menu:
-#             size_hint: None, None
-#             index:0
+<PreprocScreen>:
+    FloatLayout:
+        size_hint: None, None
+        preproc: preproc
+        # name: 'preprocScreen'
+        Preproc_Anim:
+            size_hint:None, None
+            id: preproc
+            index: 2
+
+        Button:
+            size_hint: None, None
+            center: win.width/2, win.height/4
+            size: 100, 50
+            text: "open popup"
+            on_press: app.manager.preproc_popup()
+        Menu:
+            size_hint: None, None
+            index:0
     # ModalView:
     #     id: modal
     #     size_hint: .5, .5

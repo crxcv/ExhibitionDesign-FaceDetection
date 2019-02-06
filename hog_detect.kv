@@ -8,32 +8,32 @@
 #:set y1 win_height/3 * 2  - img_h/2
 #:set img_x x1 - ((img_w - img_h)/2 )
 
-<RoundImage>:
-    texture: None
-    size: root.target_w, root.target_h
-    # canvas.before:
-    #     Color:
-    #         rgba: 0, 1, 1, .5
-    #     Rectangle:
-    #         # self here refers to the widget i.e FloatLayout
-    #         pos: self.pos
-    #         size: self.size
-    canvas:
-        StencilPush
-        Ellipse:
-            pos: self.pos
-            size: self.height, self.height
-        StencilUse
-        Rectangle:
-            id: original
-            texture: self.texture
-            pos: self.x - ((root.target_w - root.target_h)/2),  self.y
-            size: self.width, self.height
-        StencilUnUse
-        Ellipse:
-            pos: self.pos
-            size: self.height, self.height
-        StencilPop
+# <RoundImage>:
+#     texture: None
+#     size: root.target_w, root.target_h
+#     # canvas.before:
+#     #     Color:
+#     #         rgba: 0, 1, 1, .5
+#     #     Rectangle:
+#     #         # self here refers to the widget i.e FloatLayout
+#     #         pos: self.pos
+#     #         size: self.size
+#     canvas:
+#         StencilPush
+#         Ellipse:
+#             pos: self.pos
+#             size: self.height, self.height
+#         StencilUse
+#         Rectangle:
+#             id: original
+#             texture: self.texture
+#             pos: self.x - ((root.target_w - root.target_h)/2),  self.y
+#             size: self.width, self.height
+#         StencilUnUse
+#         Ellipse:
+#             pos: self.pos
+#             size: self.height, self.height
+#         StencilPop
 
 <Hog_Anim>:
     id: anim
