@@ -96,7 +96,10 @@ class KivyCamera(FloatLayout):
         #                     self.sobel_cam, self.angle_cam, self.angle_cam,
         #                     self.mag_cam, self.mag_cam, self.hog_cam,
         #                     self.hog_cam, self.detect_faces, self.detect_faces]
-        self.cam_screens = [self.original, self.sobelx_cam,
+        self.cam_screens = [self.original,
+                            self.grey_cam,
+                            self.blur_cam,
+                            self.sobelx_cam,
                             self.sobely_cam,
                             self.angle_cam,
                             self.mag_cam, self.hog_cam,
@@ -171,27 +174,34 @@ class KivyCamera(FloatLayout):
         return np.uint32(frame)
 
     def original(self, frame, gray, uint8=True):
-        self.active_function = "No Faces"
+        self.active_function = "orig"
         self.wait_sec = 5
-
         return frame
 
+    def grey_cam(self, frame, gray):
+        self.active_function = "preproc"
+        return gray
+
+    def blur_cam(self, frame, gray):
+        self.active_function = "preproc"
+        return cv2.medianBlur(gray, 11)
+
     def sobelx_cam(self, frame, gray, uint8=True):
-        self.active_function = "Sobelx"
+        self.active_function = "edge"
         blur = cv2.medianBlur(gray, 11)
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
 
         return sobelx
 
     def sobely_cam(self, frame, gray, uint8=True):
-        self.active_function = "Sobely"
+        self.active_function = "edge"
         blur = cv2.medianBlur(gray, 11)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
 
         return sobely
 
     def angle_cam(self, frame, gray, uint8=True):
-        self.active_function = "Angle"
+        self.active_function = "edge"
         blur = cv2.medianBlur(gray, 11)
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
@@ -200,7 +210,7 @@ class KivyCamera(FloatLayout):
         return angle
 
     def mag_cam(self, frame, gray, uint8=True):
-        self.active_function = "Magnitude"
+        self.active_function = "edge"
         blur = cv2.medianBlur(gray, 11)
         sobelx = cv2.Sobel(blur, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(blur, cv2.CV_64F, 0, 1, ksize=3)
@@ -209,7 +219,7 @@ class KivyCamera(FloatLayout):
         return mag
 
     def hog_cam(self, frame, gray, uint8=True):
-        self.active_function = "HOG"
+        self.active_function = "hog"
         (H, hogImage) = feature.hog(gray, orientations=9,
                                     pixels_per_cell=(8, 8),
                                     cells_per_block=(8, 8),
@@ -287,13 +297,9 @@ class KivyCamera(FloatLayout):
                 self.label.text += 'erledigt. \n\n'
             self.label.texture_update()
 
-
-
-                # self.display_func = self.original
-
         # touint8 = True if self.wait_sec > 2 else False
         # self.remove_widget(self.picture)
-        new_pic = self.display_func(frame, gray, uint8=self.touint8)
+        new_pic = self.display_func(frame, gray)
         new_pic = cv2.flip(new_pic, 1)
         col_fmt = None if (len(new_pic.shape)>2) else 'gray'
         self.ax.imshow(new_pic, col_fmt)
@@ -304,7 +310,6 @@ class KivyCamera(FloatLayout):
         self.coords_bottom = []
         self.widths = []
         self.circle_c = []
-
 
     def stop(self):
         print("stopping video capture")
@@ -331,7 +336,7 @@ class Rings(Widget):
 
 
 class CameraScreen(Widget):
-    # active_function = StringProperty("not set yet")
+    active_function = StringProperty("not set yet")
 
     def __init__(self, **kwargs):
         super(CameraScreen, self).__init__(**kwargs)
@@ -364,7 +369,8 @@ class CameraScreen(Widget):
 
 
     def update(self, dt):
-        # print(self.cam.active_function)ß
+        print(self.cam.active_function)
+        self.active_function = self.cam.active_function
         self.label.text = self.cam.active_function
         if self.is_running:
             self.cam.update(dt)

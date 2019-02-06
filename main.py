@@ -185,10 +185,7 @@ class CircleButton(ButtonBehavior, Widget):
                                  x=x,
                                  y=y,
                                  t='in_elastic', duration=.4)
-                # anim = Animation(size=(600, 600), radius=300,
-                #                  x=self.animated_pos[0],
-                #                  y=self.animated_pos[1],
-                #                  t='in_elastic', duration=.4)
+
                 anim.bind(on_start=self.toggle_button,
                           on_complete=self.toggle_button)
                 anim.start(self)
@@ -207,11 +204,20 @@ class CircleButton(ButtonBehavior, Widget):
                                  t='out_elastic', duration=.4)
                 anim.bind(on_start=self.toggle_button,
                           on_complete=self.toggle_button)
-                # anim = Animation(size=(300, 300), radius=150,
-                #                  x=self.origin_pos[0],
-                #                  y=self.origin_pos[1],
-                #                  t='out_elastic', duration=.4)
+
                 anim.start(self)
+
+    def pulse(self):
+        # in_out_back
+        cx = self.center_x
+        cy = self.center_y
+        ani = Animation(size=(400, 400), radius=200,
+                        center_x=cx, center_y=cy,
+                        t='in_out_back', duration=.1)
+        ani += Animation(size=(300, 300), radius=150,
+                         center_x=cx, center_y=cy,
+                         t='in_out_back', duration=.1)
+        ani.start(self)
 
 
 class Menu(Widget):
